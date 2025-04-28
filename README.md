@@ -48,7 +48,7 @@ Flashcards Master - это образовательная платформа, к
 2.  Создайте файл `.env` в корне директории `backend` и добавьте необходимые переменные окружения:
     ```dotenv
     MONGODB_URI=mongodb://your_mongo_uri # Строка подключения к вашей MongoDB
-    PORT=8080 # Порт, на котором будет работать бэкенд
+    PORT= # Порт, на котором будет работать бэкенд
     JWT_SECRET=your_jwt_secret_key # Секретный ключ для подписи JWT токенов
     GEMINI_API_KEY=your_google_gemini_api_key # Ключ API для Google Gemini
     NODE_ENV=development # Установите 'production' для продакшн сборки
@@ -110,6 +110,3 @@ Flashcards Master - это образовательная платформа, к
 
 [Ссылка на ваше видео-демо (Loom, YouTube и т.д.)]
 
-## Лицензия
-
-[Укажите тип лицензии, если есть, например, MIT] 
