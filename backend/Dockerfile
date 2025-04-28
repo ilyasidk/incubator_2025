@@ -2,11 +2,11 @@
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend
 # Копируем только package файлы сначала для кеширования зависимостей
-COPY ../frontend/package*.json ./
+COPY frontend/package*.json ./
 # Устанавливаем зависимости фронтенда (включая devDependencies для сборки)
 RUN npm install
 # Копируем остальной код фронтенда
-COPY ../frontend/ ./
+COPY frontend/ ./
 # Собираем CSS
 RUN npm run build:css
 
