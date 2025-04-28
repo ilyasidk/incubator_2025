@@ -31,7 +31,9 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copy production backend dependencies and code from backend-builder
-COPY --from=backend-builder /usr/src/backend .
+COPY --from=backend-builder /usr/src/backend/package*.json ./
+COPY --from=backend-builder /usr/src/backend/node_modules ./node_modules/
+COPY --from=backend-builder /usr/src/backend/ ./
 
 # Copy built frontend assets from frontend-builder into a public directory
 COPY --from=frontend-builder /usr/src/frontend/dist ./public
