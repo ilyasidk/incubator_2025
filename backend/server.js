@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config(); // Раскомментировано для Dockerfile
+require('dotenv').config(); // Используется для локальной разработки и в Dockerfile
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
