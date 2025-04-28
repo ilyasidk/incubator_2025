@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config();
+// require('dotenv').config(); // Закомментировано - переменные окружения будут предоставлены Cloud Run
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
