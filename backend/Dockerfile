@@ -1,3 +1,4 @@
+# Dockerfile для сборки с корневым контекстом (.)
 # Stage 1: Build frontend assets
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend

@@ -1,3 +1,5 @@
+# Cloud Build конфигурация для деплоя на Cloud Run
+# Контекст сборки: корень репозитория, файл Dockerfile: backend/Dockerfile
 steps:
 # Шаг 1: Сборка Docker-образа
 - name: 'gcr.io/cloud-builders/docker'
