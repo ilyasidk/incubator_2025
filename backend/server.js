@@ -1,3 +1,4 @@
+const path = require('path');
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -17,9 +18,13 @@ const PORT = process.env.PORT || 8080;
 app.use(cors()); // Basic CORS configuration, adjust as needed
 app.use(express.json()); // for parsing application/json
 
-// Basic Route
+// Serve static files from 'public' directory relative to server.js
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Basic Route - Changed to serve index.html
 app.get('/', (req, res) => {
-  res.send('Flashcards Master Backend is running!');
+  // res.send('Flashcards Master Backend is running!'); // Старый вариант
+  res.sendFile(path.join(__dirname, 'public', 'index.html')); // Отдаем index.html из папки public
 });
 
 // API Routes
