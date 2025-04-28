@@ -2,11 +2,11 @@
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend
 # Копируем только package файлы сначала для кеширования зависимостей
-COPY frontend/package*.json ./
+COPY ../frontend/package*.json ./
 # Устанавливаем зависимости фронтенда (включая devDependencies для сборки)
 RUN npm install
 # Копируем остальной код фронтенда
-COPY frontend/ ./
+COPY ../frontend/ ./
 # Собираем CSS
 RUN npm run build:css
 
@@ -14,8 +14,8 @@ RUN npm run build:css
 FROM node:18-alpine
 WORKDIR /usr/src/app
 
-# Копируем package файлы бэкенда отдельно
-COPY backend/package.json backend/package-lock.json ./
+# Копируем package файлы бэкенда отдельно из контекста (backend/)
+COPY package.json package-lock.json ./
 # Устанавливаем ТОЛЬКО production зависимости бэкенда
 RUN npm ci --only=production
 
@@ -28,8 +28,9 @@ COPY --from=frontend-builder /usr/src/frontend/dashboard.js ./public/
 COPY --from=frontend-builder /usr/src/frontend/src/generator.js ./public/
 COPY --from=frontend-builder /usr/src/frontend/style.css ./public/
 
-# Копируем остальной код бэкенда (все содержимое папки backend)
-COPY backend/* .
+# Копируем остальной код бэкенда из контекста (backend/)
+# Копируем все из контекста в WORKDIR
+COPY . .
 
 # Порт, который слушает приложение (Cloud Run использует $PORT)
 EXPOSE 8080

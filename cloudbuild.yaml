@@ -1,0 +1,43 @@
+steps:
+# Шаг 1: Сборка Docker-образа
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    # -f указывает путь к Dockerfile ОТНОСИТЕЛЬНО КОРНЯ РЕПОЗИТОРИЯ
+    - '-f'
+    - 'backend/Dockerfile'
+    # -t задает тег образа: LOCATION-docker.pkg.dev/PROJECT_ID/REPO_NAME/IMAGE_NAME:latest
+    # Замените YOUR_PROJECT_ID и YOUR_REGION. AR_REPO_NAME - имя репозитория Artifact Registry (можно создать, например, 'cloud-run-source-deploy')
+    - '-t'
+    - 'YOUR_REGION-docker.pkg.dev/YOUR_PROJECT_ID/cloud-run-source-deploy/incubator2025:latest'
+    # Последний аргумент - контекст сборки ОТНОСИТЕЛЬНО КОРНЯ РЕПОЗИТОРИЯ
+    - 'backend/'
+
+# Шаг 2: Пуш образа в Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - 'YOUR_REGION-docker.pkg.dev/YOUR_PROJECT_ID/cloud-run-source-deploy/incubator2025:latest'
+
+# Шаг 3: Деплой образа в Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args:
+    - 'run'
+    - 'deploy'
+    - 'incubator2025' # Имя вашего сервиса Cloud Run
+    - '--image'
+    - 'YOUR_REGION-docker.pkg.dev/YOUR_PROJECT_ID/cloud-run-source-deploy/incubator2025:latest'
+    - '--region'
+    - 'YOUR_REGION' # Регион вашего сервиса Cloud Run
+    - '--platform'
+    - 'managed'
+    # Раскомментируйте и добавьте, если вам нужна аутентификация (иначе будет публичный доступ)
+    # - '--allow-unauthenticated'
+
+# Указываем собранный образ
+images:
+- 'YOUR_REGION-docker.pkg.dev/YOUR_PROJECT_ID/cloud-run-source-deploy/incubator2025:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY 
