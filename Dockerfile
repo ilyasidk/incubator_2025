@@ -18,9 +18,9 @@ FROM node:18-alpine AS backend-builder
 
 WORKDIR /usr/src/backend
 
-# Copy backend package files and install production dependencies
+# Copy backend package files and install all dependencies
 COPY ./backend/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy the rest of the backend source code
 COPY ./backend/ .
