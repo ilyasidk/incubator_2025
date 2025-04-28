@@ -1,0 +1,24 @@
+{
+  "name": "n!",
+  "version": "1.0.0",
+  "description": "Веб-приложение для создания и изучения флеш-карточек, с возможностью автоматической генерации контента с помощью Google Gemini AI.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilyasidk/incubator_2025.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ilyasidk/incubator_2025/issues"
+  },
+  "homepage": "https://github.com/ilyasidk/incubator_2025#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

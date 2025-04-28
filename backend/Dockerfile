@@ -1,10 +1,10 @@
-# Dockerfile для сборки с контекстом backend/
+# Dockerfile для сборки с контекстом из корня репозитория
 # Зависимости и переменные окружения
 FROM node:18-alpine
 WORKDIR /usr/src/app
 
-# Копируем package файлы бэкенда из текущей директории
-COPY package.json package-lock.json ./
+# Копируем package файлы бэкенда из директории backend
+COPY backend/package.json backend/package-lock.json ./
 # Устанавливаем ТОЛЬКО production зависимости бэкенда
 RUN npm ci --only=production
 
@@ -19,8 +19,8 @@ RUN mkdir -p public/src
 RUN touch public/src/generator.js
 RUN touch public/style.css
 
-# Копируем остальной код бэкенда из текущей директории
-COPY . .
+# Копируем остальной код бэкенда
+COPY backend/ .
 
 # Порт, который слушает приложение (Cloud Run использует $PORT)
 EXPOSE 8080
