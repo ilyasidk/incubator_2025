@@ -1,13 +1,18 @@
-# Dockerfile для сборки с корневым контекстом (.)
+# Dockerfile для сборки с контекстом backend/
+# Принимает аргумент ROOT_DIR для доступа к файлам вне контекста
+ARG ROOT_DIR=../
+
 # Stage 1: Build frontend assets
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend
-# Копируем только package файлы сначала для кеширования зависимостей
-COPY frontend/package*.json ./
+
+# Копируем только package файлы фронтенда
+# Используем $ROOT_DIR для доступа к frontend/
+COPY ${ROOT_DIR}frontend/package*.json ./
 # Устанавливаем зависимости фронтенда (включая devDependencies для сборки)
 RUN npm install
 # Копируем остальной код фронтенда
-COPY frontend/ ./
+COPY ${ROOT_DIR}frontend/ ./
 # Собираем CSS
 RUN npm run build:css
 
@@ -15,8 +20,8 @@ RUN npm run build:css
 FROM node:18-alpine
 WORKDIR /usr/src/app
 
-# Копируем package файлы бэкенда из корневого контекста
-COPY backend/package.json backend/package-lock.json ./
+# Копируем package файлы бэкенда из текущей директории
+COPY package.json package-lock.json ./
 # Устанавливаем ТОЛЬКО production зависимости бэкенда
 RUN npm ci --only=production
 
@@ -29,8 +34,9 @@ COPY --from=frontend-builder /usr/src/frontend/dashboard.js ./public/
 COPY --from=frontend-builder /usr/src/frontend/src/generator.js ./public/
 COPY --from=frontend-builder /usr/src/frontend/style.css ./public/
 
-# Копируем остальной код бэкенда из корневого контекста
-COPY backend/ ./
+# Копируем остальной код бэкенда из текущей директории
+# Копируем все из текущей директории в WORKDIR
+COPY . .
 
 # Порт, который слушает приложение (Cloud Run использует $PORT)
 EXPOSE 8080
