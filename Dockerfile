@@ -5,7 +5,7 @@ WORKDIR /usr/src/frontend
 
 # Copy frontend package files and install dependencies
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm ci
 
 # Copy the rest of the frontend source code
 COPY frontend/ .
@@ -19,11 +19,11 @@ FROM node:18-alpine AS backend-builder
 WORKDIR /usr/src/backend
 
 # Copy backend package files and install production dependencies
-COPY backend/package*.json ./
+COPY ./backend/package*.json ./
 RUN npm ci --only=production
 
 # Copy the rest of the backend source code
-COPY backend/ .
+COPY ./backend/ .
 
 # Final Stage: Combine Frontend and Backend
 FROM node:18-alpine
@@ -37,7 +37,7 @@ COPY --from=backend-builder /usr/src/backend .
 COPY --from=frontend-builder /usr/src/frontend/dist ./public
 
 # Expose the port the app runs on (Cloud Run will set this via PORT env var)
-# EXPOSE 8080 # Not strictly needed as Cloud Run injects PORT
+EXPOSE 8080
 
 # Define environment variable
 ENV NODE_ENV production
