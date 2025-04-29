@@ -30,8 +30,19 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-# Copy all backend code and node_modules from backend-builder
-COPY --from=backend-builder /usr/src/backend .
+# Copy package files from backend-builder first
+COPY --from=backend-builder /usr/src/backend/package*.json ./
+
+# Install production dependencies directly in the final image
+RUN npm ci --only=production
+
+# Copy the rest of the backend code (excluding node_modules)
+# Note: We copy '.' from the builder, which contains everything.
+# We rely on the previous npm ci having created node_modules here,
+# and potentially overwriting node_modules from the copy if it existed.
+# A potentially safer way might be to explicitly list what to copy, 
+# but this is common practice.
+COPY --from=backend-builder /usr/src/backend . 
 
 # Copy built frontend assets from frontend-builder into a public directory
 COPY --from=frontend-builder /usr/src/frontend/dist ./public
