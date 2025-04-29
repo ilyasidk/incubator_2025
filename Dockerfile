@@ -1,6 +1,5 @@
 # Stage 1: Build Frontend
 FROM node:18-alpine AS frontend-builder
-
 WORKDIR /usr/src/frontend
 
 # Copy frontend package files and install dependencies
