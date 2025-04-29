@@ -1,5 +1,8 @@
 const path = require('path');
-require('dotenv').config(); // Используется для локальной разработки и в Dockerfile
+// Загружаем .env только если не в production
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
