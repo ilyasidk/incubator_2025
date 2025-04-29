@@ -1,5 +1,5 @@
 // Configuration
-const API_URL = 'http://localhost:8000'; // Define the base URL for the backend API
+const API_URL = '/api'; // Define the base URL for the backend API
 
 // State Variables
 let currentTopicId = null;
@@ -30,16 +30,16 @@ const addTopicError = document.getElementById('add-topic-error');
 // DOM Elements - Flashcard Display Area
 const currentTopicElement = document.getElementById('current-topic');
 const cardCounter = document.getElementById('card-counter');
-const noCardsMessage = document.getElementById('no-cards-message'); // Message div
-const cardNavigation = document.getElementById('card-navigation'); // Nav buttons container
+const noCardsMessage = document.getElementById('no-cards-message'); 
+const cardNavigation = document.getElementById('card-navigation'); 
 
 // DOM Elements - Flip Card Mode
 const flipCardContainer = document.getElementById('flip-card-container');
 const cardElement = flipCardContainer.querySelector('.card');
 const cardQuestion = document.getElementById('card-question');
 const cardAnswer = document.getElementById('card-answer');
-const cardFront = cardElement.querySelector('.card-front'); // More specific selector
-const cardBack = cardElement.querySelector('.card-back');   // More specific selector
+const cardFront = cardElement.querySelector('.card-front'); 
+const cardBack = cardElement.querySelector('.card-back');  
 
 // DOM Elements - Study Mode
 const studyCardContainer = document.getElementById('study-card-container');
@@ -52,7 +52,7 @@ const cardActions = document.getElementById('card-actions');
 const addCardBtn = document.getElementById('add-card-btn');
 const editCardBtn = document.getElementById('edit-card-btn');
 const deleteCardBtn = document.getElementById('delete-card-btn');
-const addFirstCardBtn = document.getElementById('add-first-card-btn'); // In no-cards message
+const addFirstCardBtn = document.getElementById('add-first-card-btn'); 
 
 // DOM Elements - Navigation Buttons
 const prevBtn = document.getElementById('prev-btn');
@@ -64,18 +64,18 @@ const progressPercentage = document.getElementById('progress-percentage');
 const progressRatio = document.getElementById('progress-ratio');
 
 // DOM Elements - Generate Modal
-const generateBtn = document.getElementById('generate-btn'); // Button in nav
-const welcomeGenerateBtn = document.getElementById('welcome-generate'); // Button in welcome message
-const generateCardsLinkAlt = document.getElementById('generate-cards-link-alt'); // Link in no-cards message
+const generateBtn = document.getElementById('generate-btn'); 
+const welcomeGenerateBtn = document.getElementById('welcome-generate'); 
+const generateCardsLinkAlt = document.getElementById('generate-cards-link-alt'); 
 const generateModal = document.getElementById('generate-modal');
-const generateForm = document.getElementById('generate-form'); // Get the form element
+const generateForm = document.getElementById('generate-form'); 
 const generateTopicInput = document.getElementById('generate-topic');
 const generateCountSelect = document.getElementById('generate-count');
 const confirmGenerateBtn = document.getElementById('confirm-generate');
 const cancelGenerateBtn = document.getElementById('cancel-generate');
 const generateError = document.getElementById('generate-error');
 const generationProgress = document.getElementById('generation-progress');
-const generationProgressBar = document.getElementById('generation-progress-bar'); // Get progress bar
+const generationProgressBar = document.getElementById('generation-progress-bar');
 
 // DOM Elements - Add Card Modal
 const addCardModal = document.getElementById('add-card-modal');
@@ -99,18 +99,16 @@ const confirmEditCardBtn = document.getElementById('confirm-edit-card');
 // DOM Elements - Other
 const logoutBtn = document.getElementById('logout-btn');
 
-// New elements
 const explainAiBtn = document.getElementById('explain-ai-btn');
 const aiExplanationContainer = document.getElementById('ai-explanation-container');
 const aiExplanationText = document.getElementById('ai-explanation-text');
 
-// --- Utility Functions ---
 async function apiRequest(endpoint, method = 'GET', body = null) {
     const token = localStorage.getItem('token');
     const options = {
         method,
         headers: {
-            'Authorization': `Bearer ${token || ''}`, // Include token if available
+            'Authorization': `Bearer ${token || ''}`, 
         }
     };
     if (body) {
@@ -118,11 +116,10 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
         options.body = JSON.stringify(body);
     }
     try {
-        // Construct the full URL using API_URL and endpoint
-        const response = await fetch(`${API_URL}/api${endpoint}`, options); 
+        const response = await fetch(`${API_URL}${endpoint}`, options); 
         if (!response.ok) {
             if (response.status === 401) {
-                logout(); // Token expired or invalid
+                logout(); 
                 throw new Error('Session expired. Please log in again.');
             }
             let errorData;
@@ -133,14 +130,13 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
             }
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
-        // Handle responses that might not have a body (e.g., DELETE, PUT with no content)
         if (response.status === 204 || response.headers.get("content-length") === "0") {
             return null;
         }
         return await response.json();
     } catch (error) {
         console.error('API Request Error:', endpoint, error);
-        throw error; // Re-throw
+        throw error; 
     }
 }
 
@@ -165,24 +161,21 @@ function clearModalError(errorElement) {
 function toggleButtonLoading(buttonElement, isLoading, loadingText = 'Loading...', originalText = null) {
     if (!buttonElement) return;
     if (isLoading) {
-        buttonElement.dataset.originalText = buttonElement.textContent; // Store original text
+        buttonElement.dataset.originalText = buttonElement.textContent;
         buttonElement.textContent = loadingText;
         buttonElement.disabled = true;
     } else {
-        buttonElement.textContent = originalText || buttonElement.dataset.originalText || 'Submit'; // Restore text
+        buttonElement.textContent = originalText || buttonElement.dataset.originalText || 'Submit';
         buttonElement.disabled = false;
     }
 }
 
 
-// --- Authentication ---
 function checkAuth() {
     const token = localStorage.getItem('token');
     if (!token) {
-        // Redirect to login page if no token
         window.location.href = 'index.html';
     }
-    // Optionally, could add a check here to verify token with the backend
 }
 
 function logout() {
@@ -191,7 +184,6 @@ function logout() {
 }
 
 
-// --- Topic Management ---
 async function loadTopics() {
     try {
         const topics = await apiRequest('/topics');
@@ -202,7 +194,7 @@ async function loadTopics() {
     }
 }
 
-function displayTopics(topics, allProgress = []) { // Default progress to empty array
+function displayTopics(topics, allProgress = []) { 
      if (!Array.isArray(topics)) {
         console.error("Invalid topics data received:", topics);
         topicsList.innerHTML = '<li class="p-2 text-center text-red-500">Failed to load topics data.</li>';
@@ -214,23 +206,11 @@ function displayTopics(topics, allProgress = []) { // Default progress to empty 
         return;
     }
 
-    // Create a map of topic progress by topicId for quick lookup (if progress data is available)
-    // const progressMap = {};
-    // if(Array.isArray(allProgress)) {
-    //     allProgress.forEach(prog => {
-    //         if(prog && prog.topicId) { // Basic validation
-    //              progressMap[prog.topicId] = prog;
-    //         }
-    //     });
-    // }
+
 
     topicsList.innerHTML = topics.map(topic => {
-        if (!topic || !topic._id) return ''; // Skip invalid topic data
+        if (!topic || !topic._id) return ''; 
 
-        // Progress display logic (currently commented out)
-        // ...
-
-        // Removed flex, justify-between, items-center and the SVG icon
         return `
             <li class="topic-item p-3 bg-gray-100 hover:bg-gray-200 rounded cursor-pointer mb-2" data-id="${topic._id}">
                 <span class="font-medium mr-2">${topic.name || 'Unnamed Topic'}</span>
@@ -239,9 +219,7 @@ function displayTopics(topics, allProgress = []) { // Default progress to empty 
         `;
     }).join('');
 
-    // Add event listeners to topic items
     document.querySelectorAll('.topic-item').forEach(item => {
-        // Pass topic name to loadCardsForTopic for immediate display
         const topicName = item.querySelector('span').textContent;
         item.addEventListener('click', () => loadCardsForTopic(item.dataset.id, topicName));
     });
@@ -259,14 +237,14 @@ function closeAddTopicModal() {
 }
 
 async function handleAddTopicSubmit(event) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); 
     const name = topicNameInput.value.trim();
     const description = topicDescriptionInput.value.trim();
 
-    clearModalError(addTopicError); // Clear previous errors
+    clearModalError(addTopicError); 
 
     if (!name) {
-        displayModalError(addTopicError, 'Topic name is required'); // Display error in modal
+        displayModalError(addTopicError, 'Topic name is required'); 
         return;
     }
 
@@ -276,11 +254,11 @@ async function handleAddTopicSubmit(event) {
         const newTopic = await apiRequest('/topics', 'POST', { name, description });
         console.log(`Topic "${name}" added successfully!`);
         closeAddTopicModal();
-        loadTopics(); // Refresh the list
+        loadTopics();
 
     } catch (error) {
         console.error("Error adding topic:", error);
-        displayModalError(addTopicError, error.message || 'Failed to add topic.'); // Display error in modal
+        displayModalError(addTopicError, error.message || 'Failed to add topic.'); 
     } finally {
         toggleButtonLoading(confirmAddTopicBtn, false);
     }
@@ -292,35 +270,32 @@ async function loadCardsForTopic(topicId, topicName = 'Selected Topic') {
     currentCards = [];
     currentCardIndex = 0;
     currentDisplayedCard = null;
-    currentTopicElement.textContent = topicName; // Set topic name immediately
+    currentTopicElement.textContent = topicName; 
 
-    updateUIState('loadingCards'); // Show loading state
+    updateUIState('loadingCards');
 
     if (!topicId) {
         console.error("No Topic ID provided.");
-        updateUIState('welcome'); // Revert to welcome if no ID
+        updateUIState('welcome'); 
         return;
     }
 
     try {
         const cards = await apiRequest(`/cards/topic/${topicId}`);
-        currentCards = Array.isArray(cards) ? cards : []; // Ensure it's an array
+        currentCards = Array.isArray(cards) ? cards : [];
 
         if (currentCards.length > 0) {
             updateUIState('displayingCards');
             displayCard(currentCards[0], 0, currentCards.length);
-            // loadProgressForTopic(topicId); // Load progress after cards are loaded
         } else {
             updateUIState('noCards');
         }
-        // Reset flip state
         cardElement.classList.remove('flipped');
-        // Reset study mode visual
-        toggleStudyMode(studyModeToggle.checked, true); // Force UI update for mode
+        toggleStudyMode(studyModeToggle.checked, true); 
 
     } catch (error) {
         console.error('Error loading cards:', error);
-        updateUIState('noCards'); // Show no cards message on error
+        updateUIState('noCards'); 
     }
 }
 
@@ -331,28 +306,24 @@ function displayCard(card, index, total) {
         return;
     }
 
-    currentDisplayedCard = card; // Store the current card object
+    currentDisplayedCard = card; 
 
-    // Update both Flip and Study mode cards
     cardQuestion.textContent = card.question || '[No Question]';
     cardAnswer.textContent = card.answer || '[No Answer]';
     studyCardQuestion.textContent = card.question || '[No Question]';
     studyCardAnswer.textContent = card.answer || '[No Answer]';
 
     cardCounter.textContent = `Card ${index + 1} of ${total}`;
-    cardElement.classList.remove('flipped'); // Ensure card starts unflipped
+    cardElement.classList.remove('flipped'); 
 
-    // Update button states
     prevBtn.disabled = index === 0;
     nextBtn.disabled = index === total - 1;
 
-    // Reset AI explanation area when displaying a new card
     aiExplanationContainer.classList.add('hidden');
     aiExplanationText.textContent = '';
 }
 
 function updateUIState(state, message = '') {
-    // Hide all potentially visible containers first
     welcomeContainer.classList.add('hidden');
     flashcardContainer.classList.add('hidden');
     progressContainer.classList.add('hidden');
@@ -363,11 +334,11 @@ function updateUIState(state, message = '') {
     studyCardContainer.classList.add('hidden');
     editCardBtn.classList.add('hidden');
     deleteCardBtn.classList.add('hidden');
-    // Hide buttons within noCardsMessage by default
-    const noCardsPara = noCardsMessage.querySelector('p'); // Get the paragraph
+
+    const noCardsPara = noCardsMessage.querySelector('p'); 
     const addFirstBtn = document.getElementById('add-first-card-btn');
     const generateLinkAlt = document.getElementById('generate-cards-link-alt');
-    const orSpan = noCardsMessage.querySelector('span.mx-2'); // Get the 'or' span
+    const orSpan = noCardsMessage.querySelector('span.mx-2'); 
     if (addFirstBtn) addFirstBtn.classList.add('hidden');
     if (generateLinkAlt) generateLinkAlt.classList.add('hidden');
     if (orSpan) orSpan.classList.add('hidden');
@@ -378,43 +349,38 @@ function updateUIState(state, message = '') {
             break;
         case 'loadingCards':
             flashcardContainer.classList.remove('hidden');
-             // Optionally show a loading spinner here
              cardQuestion.textContent = "Loading...";
              cardAnswer.textContent = "Loading...";
              studyCardQuestion.textContent = "Loading...";
              studyCardAnswer.textContent = "Loading...";
              cardCounter.textContent = '';
-             cardActions.classList.remove('hidden'); // Show Add button even while loading
+             cardActions.classList.remove('hidden'); 
              break;
         case 'displayingCards':
             flashcardContainer.classList.remove('hidden');
             cardNavigation.classList.remove('hidden');
             cardActions.classList.remove('hidden');
-            editCardBtn.classList.remove('hidden'); // Show edit/delete only if cards exist
+            editCardBtn.classList.remove('hidden'); 
             deleteCardBtn.classList.remove('hidden');
-             // Decide which card mode container to show based on toggle
-            toggleStudyMode(studyModeToggle.checked, true); // Update visibility based on current mode
-            // progressContainer.classList.remove('hidden'); // Show progress
+            toggleStudyMode(studyModeToggle.checked, true); 
             break;
         case 'noCards':
             flashcardContainer.classList.remove('hidden');
             noCardsMessage.classList.remove('hidden');
-            if (noCardsPara) noCardsPara.textContent = 'No cards available for this topic.'; // Set default text
-            if (addFirstBtn) addFirstBtn.classList.remove('hidden'); // Show buttons
+            if (noCardsPara) noCardsPara.textContent = 'No cards available for this topic.';
+            if (addFirstBtn) addFirstBtn.classList.remove('hidden'); 
             if (generateLinkAlt) generateLinkAlt.classList.remove('hidden');
             if (orSpan) orSpan.classList.remove('hidden');
-            cardActions.classList.remove('hidden'); // Keep Add button visible
+            cardActions.classList.remove('hidden'); 
             cardCounter.textContent = 'Card 0 of 0';
             break;
-        case 'topicFinished': // NEW STATE
+        case 'topicFinished': 
             flashcardContainer.classList.remove('hidden');
             noCardsMessage.classList.remove('hidden');
-            if (noCardsPara) noCardsPara.textContent = message; // Display completion message
-            // Keep buttons hidden (default behavior)
-            cardActions.classList.add('hidden'); // Hide card actions too
-            cardCounter.textContent = ''; // Clear card counter
+            if (noCardsPara) noCardsPara.textContent = message; 
+            cardActions.classList.add('hidden'); 
+            cardCounter.textContent = ''; 
             break;
-        // Add other states if needed (e.g., 'errorLoading')
     }
 }
 
@@ -434,36 +400,31 @@ function prevCard() {
 }
 
 function flipCard() {
-     // Only flip if in flip mode
      if (!studyModeToggle.checked) {
          cardElement.classList.toggle('flipped');
      }
 }
 
-// Modified to prevent accidental flips and update UI state
 function toggleStudyMode(isStudyMode, forceUpdate = false) {
-    // If not forcing update, read from checkbox
     const mode = forceUpdate ? isStudyMode : studyModeToggle.checked;
 
-     if (mode) { // Study Mode Active
+     if (mode) { 
          flipCardContainer.classList.add('hidden');
-         if (currentCards.length > 0) { // Only show if cards exist
+         if (currentCards.length > 0) { 
              studyCardContainer.classList.remove('hidden');
          }
-     } else { // Flip Mode Active
+     } else { 
          studyCardContainer.classList.add('hidden');
-         if (currentCards.length > 0) { // Only show if cards exist
+         if (currentCards.length > 0) { 
              flipCardContainer.classList.remove('hidden');
-             cardElement.classList.remove('flipped'); // Ensure flip card resets
+             cardElement.classList.remove('flipped'); 
          }
      }
-     // Make sure checkbox reflects state if forced
      if (forceUpdate && studyModeToggle.checked !== mode) {
         studyModeToggle.checked = mode;
      }
 }
 
-// --- Add/Edit/Delete Card Functions ---
 function openAddCardModal() {
     if (!currentTopicId) {
         console.error("Please select a topic first.");
@@ -502,8 +463,7 @@ async function handleAddCardSubmit(event) {
     const question = addCardQuestionInput.value.trim();
     const answer = addCardAnswerInput.value.trim();
 
-    clearModalError(addCardError); // Clear previous errors
-
+    clearModalError(addCardError); 
     if (!question || !answer) {
         displayModalError(addCardError, 'Question and Answer cannot be empty.');
         return;
@@ -517,12 +477,10 @@ async function handleAddCardSubmit(event) {
     toggleButtonLoading(confirmAddCardBtn, true, 'Adding...');
 
     try {
-        // API expects topicId, question, answer
         const newCard = await apiRequest('/cards', 'POST', { topicId: currentTopicId, question, answer });
         console.log('Card added successfully!');
         closeAddCardModal();
 
-        // Efficiently add to local array and refresh UI
         currentCards.push(newCard); // Add to the end
         currentCardIndex = currentCards.length - 1; // Go to the new card
         updateUIState('displayingCards');

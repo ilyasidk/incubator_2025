@@ -1,5 +1,5 @@
 // Configuration
-const API_URL = 'http://localhost:8000'; // Define the base URL for the backend API
+const API_URL = '/api'; // Define the base URL for the backend API
 
 // State Variables
 let currentTopicId = null;
