@@ -1,3 +1,4 @@
+# Dockerfile for Incubator 2025 Project
 # Stage 1: Build Frontend
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend
