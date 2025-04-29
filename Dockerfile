@@ -40,7 +40,7 @@ COPY --from=frontend-builder /usr/src/frontend/dist ./public
 EXPOSE 8080
 
 # Define environment variable
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # Run the backend server (which will also serve frontend)
-CMD [ "node", "server.js" ] 
+CMD ["node", "server.js"] 
