@@ -50,8 +50,5 @@ COPY --from=frontend-builder /usr/src/frontend/dist ./public
 # Expose the port the app runs on (Cloud Run will set this via PORT env var)
 EXPOSE 8080
 
-# Define environment variable
-ENV NODE_ENV=production
-
 # Run the backend server (which will also serve frontend)
 CMD ["node", "server.js"] 

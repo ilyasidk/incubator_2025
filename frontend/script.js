@@ -2,7 +2,7 @@
 console.log("Flashcards Master frontend script loaded.");
 
 // Configuration
-const API_URL = 'http://localhost:8000/api';
+const API_URL = '/api';
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');
