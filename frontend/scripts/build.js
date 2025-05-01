@@ -30,11 +30,4 @@ fs.copySync(
   path.join(__dirname, '../dist/style.css')
 );
 
-// src directory
-fs.copySync(
-  path.join(__dirname, '../src'),
-  path.join(__dirname, '../dist/src'),
-  { filter: (src) => !src.endsWith('.css') || src.endsWith('generator.js') }
-);
-
 console.log('Build complete! Files copied to dist/'); 
