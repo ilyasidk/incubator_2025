@@ -109,9 +109,9 @@ router.post('/explain', auth, async (req, res) => {
         res.json({ explanation: explanationText });
 
     } catch (error) {
-        console.error('Ошибка генерации объяснения:', error); // Перевести лог
+        console.error('Ошибка генерации объяснения:', error);
         res.status(500).json({ 
-            message: 'Ошибка генерации объяснения', // Перевести сообщение об ошибке
+            message: 'Ошибка генерации объяснения',
             error: error.message
         });
     }
