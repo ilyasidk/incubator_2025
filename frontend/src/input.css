@@ -3,12 +3,10 @@
 @tailwind utilities;
 
 @layer components {
-  /* Custom styles for flip animation */
   .card {
     @apply relative w-full h-full;
     transform-style: preserve-3d;
-    /* Faster transition with overshoot easing */
-    transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); /* Adjusted duration and easing */
+    transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); 
   }
 
   .card-front, .card-back {
@@ -21,21 +19,17 @@
   }
 
   .card-back {
-    /* Change background to white and text to dark gray */
     @apply bg-white text-gray-900; 
     transform: rotateY(180deg);
   }
 
   .card.flipped {
-    /* Flip with slight scale, no tilt */
-    transform: rotateY(180deg) scale(1.05); /* Removed rotateX, adjusted scale */
+    transform: rotateY(180deg) scale(1.05); 
   }
 
-  /* Styles for the new Study Mode */
   .study-card-inner {
       @apply flex h-full rounded-lg overflow-hidden shadow-lg;
-      /* Optional: Add transition for potential future hover effects */
-      /* transition: transform 0.3s ease; */
+
   }
 
   .study-card-side {
@@ -50,41 +44,35 @@
       @apply bg-gray-100 text-gray-800;
   }
   
-  /* Add perspective to the container for 3D effect */
   .perspective-1000 {
       perspective: 1000px;
   }
 
-  /* Keyframes for flash effect */
   @keyframes flash-red-bg {
-    0%, 100% { background-color: inherit; } /* Start and end with original background */
-    50% { background-color: #fecaca; } /* Use HEX for red-200 */
+    0%, 100% { background-color: inherit; }
+    50% { background-color: #fecaca; } 
   }
   @keyframes flash-green-bg {
-    0%, 100% { background-color: inherit; } /* Start and end with original background */
-    50% { background-color: #bbf7d0; } /* Use HEX for green-200 */
+    0%, 100% { background-color: inherit; } 
+    50% { background-color: #bbf7d0; } 
   }
 
-  /* Classes to apply the flash animation */
   .flash-red {
-    animation: flash-red-bg 0.3s ease-out; /* Apply red flash animation */
+    animation: flash-red-bg 0.3s ease-out; /
   }
   .flash-green {
-    animation: flash-green-bg 0.3s ease-out; /* Apply green flash animation */
+    animation: flash-green-bg 0.3s ease-out; 
   }
 
-  /* Styles for AI Explanation */
-  /* We will rely solely on the 'hidden' class applied via JS */
+
 
   #ai-explanation-container {
-      @apply max-h-24 overflow-y-auto bg-gray-50 p-2 rounded; /* Style the container */
+      @apply max-h-24 overflow-y-auto bg-gray-50 p-2 rounded;
   }
 }
 
-/* Add override for Notyf container positioning */
 @layer utilities {
   .notyf {
-    /* Use !important cautiously, but needed here to fight potential base style conflicts */
     @apply fixed top-5 right-5 w-auto h-auto block !important;
     position: fixed !important;
     top: 20px !important;
@@ -93,18 +81,15 @@
     left: auto !important;
     width: auto !important; 
     height: auto !important;
-    /* Remove conflicting flex properties */
     justify-content: initial !important; 
     align-items: initial !important;
-    z-index: 9999 !important; /* Ensure it's on top */
+    z-index: 9999 !important; 
   }
-  /* Ensure individual toasts stack vertically and have basic appearance */
    .notyf__toast {
-       @apply block mb-2 shadow-lg rounded bg-white !important; /* Add background/shadow defaults */
+       @apply block mb-2 shadow-lg rounded bg-white !important; 
        display: block !important; 
        margin-bottom: 0.5rem !important;
    }
-    /* Ensure wrapper inside toast behaves */
     .notyf__wrapper {
         @apply flex items-center p-3 !important;
         display: flex !important;
@@ -117,7 +102,7 @@
          margin-right: 0.75rem !important;
     }
      .notyf__message {
-         @apply text-gray-800 !important; /* Ensure text is visible on white bg */
+         @apply text-gray-800 !important; 
          color: #1f2937 !important;
      }
 } 

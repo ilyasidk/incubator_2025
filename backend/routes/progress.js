@@ -68,9 +68,9 @@ router.post('/topic/:topicId', auth, async (req, res) => {
         }
         
         // Закомментированная проверка существования темы
-        // const topic = await Topic.findById(topicId);
-        // if (!topic) {
-        //     return res.status(404).json({ message: 'Topic not found' });
+        // const topic = await Topic.findById(topicId); // Получить тему
+        // if (!topic) { // Если тема не найдена
+        //     return res.status(404).json({ message: 'Тема не найдена' });
         // }
         
         let progressDoc = await Progress.findOne({ 
@@ -92,7 +92,7 @@ router.post('/topic/:topicId', auth, async (req, res) => {
         if (status === 'known') {
             progressDoc.knownCardIds.addToSet(cardId); // Добавить в "знаю"
             progressDoc.unknownCardIds.pull(cardId);   // Удалить из "не знаю"
-        } else { // status === 'unknown'
+        } else { // status === 'unknown' // если статус "не знаю"
             progressDoc.unknownCardIds.addToSet(cardId); // Добавить в "не знаю"
             progressDoc.knownCardIds.pull(cardId);     // Удалить из "знаю"
         }

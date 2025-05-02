@@ -5,17 +5,17 @@ const Card = require('../models/Card');
 const Progress = require('../models/Progress');
 const auth = require('../middleware/auth');
 
-// Middleware to check topic ownership
+// Middleware для проверки владения темой
 async function checkTopicOwner(req, res, next) {
     try {
         const topic = await Topic.findOne({ _id: req.params.id, userId: req.userId });
         if (!topic) {
             return res.status(404).json({ message: 'Topic not found or you do not own this topic' });
         }
-        req.topic = topic; // Attach topic to request for later use
+        req.topic = topic; // Прикрепить тему к запросу для последующего использования
         next();
     } catch (error) {
-        // Handle potential CastError if ID format is invalid
+        // Обработать потенциальную ошибку CastError, если формат ID недействителен
         if (error.name === 'CastError') {
             return res.status(400).json({ message: 'Invalid topic ID format' });
         }
@@ -24,7 +24,7 @@ async function checkTopicOwner(req, res, next) {
     }
 }
 
-// Get all topics for the logged-in user
+// Получить все темы для вошедшего пользователя
 router.get('/', auth, async (req, res) => {
     try {
         const topics = await Topic.find({ userId: req.userId }).sort({ name: 1 });
@@ -35,13 +35,13 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// Get a single topic by ID (verify ownership)
+// Получить одну тему по ID (проверить владение)
 router.get('/:id', auth, checkTopicOwner, async (req, res) => {
-    // Topic is attached to req by checkTopicOwner middleware
+    // Тема прикреплена к req с помощью middleware checkTopicOwner
     res.json(req.topic);
 });
 
-// Create a new topic for the logged-in user
+// Создать новую тему для вошедшего пользователя
 router.post('/', auth, async (req, res) => {
     try {
         const { name, description } = req.body;
@@ -49,24 +49,24 @@ router.post('/', auth, async (req, res) => {
         const newTopic = new Topic({
             name,
             description,
-            userId: req.userId // Associate topic with the user
+            userId: req.userId // Связать тему с пользователем
         });
         
         const savedTopic = await newTopic.save();
         res.status(201).json(savedTopic);
     } catch (error) {
         console.error('Error creating topic:', error);
-        // Handle potential duplicate key error if needed (e.g., unique name per user)
+        // Обработать потенциальную ошибку дублирования ключа при необходимости (например, уникальное имя для пользователя)
         res.status(500).json({ message: 'Error creating topic' });
     }
 });
 
-// Update a topic (verify ownership)
+// Обновить тему (проверить владение)
 router.put('/:id', auth, checkTopicOwner, async (req, res) => {
     try {
         const { name, description } = req.body;
         
-        // req.topic is the topic document found by checkTopicOwner
+        // req.topic - это документ темы, найденный checkTopicOwner
         req.topic.name = name || req.topic.name;
         req.topic.description = description !== undefined ? description : req.topic.description;
         
@@ -78,17 +78,17 @@ router.put('/:id', auth, checkTopicOwner, async (req, res) => {
     }
 });
 
-// Delete a topic, its cards, and its progress records (verify ownership)
+// Удалить тему, ее карточки и записи прогресса (проверить владение)
 router.delete('/:id', auth, checkTopicOwner, async (req, res) => {
     try {
         const topicId = req.params.id;
         const userId = req.userId;
 
-        // Delete the topic itself
+        // Удалить саму тему
         await Topic.deleteOne({ _id: topicId, userId: userId });
-        // Delete associated cards
+        // Удалить связанные карточки
         await Card.deleteMany({ topicId: topicId, userId: userId });
-        // Delete associated progress
+        // Удалить связанный прогресс
         await Progress.deleteMany({ topicId: topicId, userId: userId });
 
         res.json({ message: 'Topic and associated data deleted successfully' });

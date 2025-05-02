@@ -1,24 +1,24 @@
-// Configuration
-const API_URL = '/api'; // Define the base URL for the backend API
+// Конфигурация
+const API_URL = '/api'; // Определить базовый URL для бэкенд API
 
-// State Variables
+// Переменные состояния
 let currentTopicId = null;
 let currentCards = [];
 let currentCardIndex = 0;
-let currentDisplayedCard = null; // Store the currently visible card object
-let progress = { knownCount: 0, unknownCount: 0 }; // Add progress state variable back
+let currentDisplayedCard = null; // Хранить текущий видимый объект карточки
+let progress = { knownCount: 0, unknownCount: 0 }; // Добавить переменную состояния прогресса обратно
 
-// DOM Elements - Main Containers
+// Элементы DOM - Основные контейнеры
 const welcomeContainer = document.getElementById('welcome-container');
 const flashcardContainer = document.getElementById('flashcard-container');
 const progressContainer = document.getElementById('progress-container');
 
-// DOM Elements - Topics
+// Элементы DOM - Темы
 const topicsList = document.getElementById('topics-list');
 const addTopicBtn = document.getElementById('add-topic-btn');
 const welcomeAddTopicBtn = document.getElementById('welcome-add-topic');
 
-// DOM Elements - Topic Modal
+// Элементы DOM - Модальное окно темы
 const addTopicModal = document.getElementById('add-topic-modal');
 const addTopicForm = document.getElementById('add-topic-form');
 const topicNameInput = document.getElementById('topic-name');
@@ -27,13 +27,13 @@ const confirmAddTopicBtn = document.getElementById('confirm-add-topic');
 const cancelAddTopicBtn = document.getElementById('cancel-add-topic');
 const addTopicError = document.getElementById('add-topic-error');
 
-// DOM Elements - Flashcard Display Area
+// Элементы DOM - Область отображения карточек
 const currentTopicElement = document.getElementById('current-topic');
 const cardCounter = document.getElementById('card-counter');
 const noCardsMessage = document.getElementById('no-cards-message'); 
 const cardNavigation = document.getElementById('card-navigation'); 
 
-// DOM Elements - Flip Card Mode
+// Элементы DOM - Режим переворота карточки
 const flipCardContainer = document.getElementById('flip-card-container');
 const cardElement = flipCardContainer.querySelector('.card');
 const cardQuestion = document.getElementById('card-question');
@@ -41,29 +41,29 @@ const cardAnswer = document.getElementById('card-answer');
 const cardFront = cardElement.querySelector('.card-front'); 
 const cardBack = cardElement.querySelector('.card-back');  
 
-// DOM Elements - Study Mode
+// Элементы DOM - Режим изучения
 const studyCardContainer = document.getElementById('study-card-container');
 const studyCardQuestion = document.getElementById('study-card-question');
 const studyCardAnswer = document.getElementById('study-card-answer');
 const studyModeToggle = document.getElementById('study-mode-toggle');
 
-// DOM Elements - Card Actions (Add/Edit/Delete)
+// Элементы DOM - Действия с карточками (Добавить/Редактировать/Удалить)
 const cardActions = document.getElementById('card-actions');
 const addCardBtn = document.getElementById('add-card-btn');
 const editCardBtn = document.getElementById('edit-card-btn');
 const deleteCardBtn = document.getElementById('delete-card-btn');
 const addFirstCardBtn = document.getElementById('add-first-card-btn'); 
 
-// DOM Elements - Navigation Buttons
+// Элементы DOM - Кнопки навигации
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 
-// DOM Elements - Progress
+// Элементы DOM - Прогресс
 const progressBar = document.getElementById('progress-bar');
 const progressPercentage = document.getElementById('progress-percentage');
 const progressRatio = document.getElementById('progress-ratio');
 
-// DOM Elements - Generate Modal
+// Элементы DOM - Модальное окно генерации
 const generateBtn = document.getElementById('generate-btn'); 
 const welcomeGenerateBtn = document.getElementById('welcome-generate'); 
 const generateCardsLinkAlt = document.getElementById('generate-cards-link-alt'); 
@@ -77,7 +77,7 @@ const generateError = document.getElementById('generate-error');
 const generationProgress = document.getElementById('generation-progress');
 const generationProgressBar = document.getElementById('generation-progress-bar');
 
-// DOM Elements - Add Card Modal
+// Элементы DOM - Модальное окно добавления карточки
 const addCardModal = document.getElementById('add-card-modal');
 const addCardForm = document.getElementById('add-card-form');
 const addCardQuestionInput = document.getElementById('add-card-question');
@@ -86,7 +86,7 @@ const addCardError = document.getElementById('add-card-error');
 const cancelAddCardBtn = document.getElementById('cancel-add-card');
 const confirmAddCardBtn = document.getElementById('confirm-add-card');
 
-// DOM Elements - Edit Card Modal
+// Элементы DOM - Модальное окно редактирования карточки
 const editCardModal = document.getElementById('edit-card-modal');
 const editCardForm = document.getElementById('edit-card-form');
 const editCardIdInput = document.getElementById('edit-card-id');
@@ -96,7 +96,7 @@ const editCardError = document.getElementById('edit-card-error');
 const cancelEditCardBtn = document.getElementById('cancel-edit-card');
 const confirmEditCardBtn = document.getElementById('confirm-edit-card');
 
-// DOM Elements - Other
+// Элементы DOM - Другое
 const logoutBtn = document.getElementById('logout-btn');
 
 const explainAiBtn = document.getElementById('explain-ai-btn');
@@ -108,7 +108,7 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
     const options = {
         method,
         headers: {
-            'Authorization': `Bearer ${token || ''}`, 
+            'Authorization': `Bearer ${token || ''}`, // Добавить токен авторизации
         }
     };
     if (body) {
@@ -116,27 +116,27 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
         options.body = JSON.stringify(body);
     }
     try {
-        const response = await fetch(`${API_URL}${endpoint}`, options); 
+        const response = await fetch(`${API_URL}${endpoint}`, options); // Выполнить запрос к API
         if (!response.ok) {
             if (response.status === 401) {
-                logout(); 
-                throw new Error('Session expired. Please log in again.');
+                logout(); // Выйти, если не авторизован
+                throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
             }
             let errorData;
             try {
-                 errorData = await response.json();
+                 errorData = await response.json(); // Попытаться получить тело ошибки
             } catch(e) {
-                errorData = { message: response.statusText || `HTTP error ${response.status}` };
+                errorData = { message: response.statusText || `HTTP ошибка ${response.status}` }; // Использовать статус-текст, если тело не JSON
             }
-            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            throw new Error(errorData.message || `HTTP ошибка! Статус: ${response.status}`);
         }
         if (response.status === 204 || response.headers.get("content-length") === "0") {
-            return null;
+            return null; // Вернуть null для ответов без контента
         }
-        return await response.json();
+        return await response.json(); // Вернуть JSON-данные
     } catch (error) {
-        console.error('API Request Error:', endpoint, error);
-        throw error; 
+        console.error('Ошибка запроса API:', endpoint, error);
+        throw error; // Перебросить ошибку для обработки выше
     }
 }
 
@@ -149,7 +149,7 @@ function toggleModal(modalElement, show) {
 }
 
 function displayModalError(errorElement, message) {
-    errorElement.textContent = message || 'An unknown error occurred.';
+    errorElement.textContent = message || 'Произошла неизвестная ошибка.';
     errorElement.classList.remove('hidden');
 }
 
@@ -158,93 +158,98 @@ function clearModalError(errorElement) {
      errorElement.classList.add('hidden');
 }
 
-function toggleButtonLoading(buttonElement, isLoading, loadingText = 'Loading...', originalText = null) {
+function toggleButtonLoading(buttonElement, isLoading, loadingText = 'Загрузка...', originalText = null) {
     if (!buttonElement) return;
     if (isLoading) {
         buttonElement.dataset.originalText = buttonElement.textContent;
         buttonElement.textContent = loadingText;
         buttonElement.disabled = true;
     } else {
-        buttonElement.textContent = originalText || buttonElement.dataset.originalText || 'Submit';
+        buttonElement.textContent = originalText || buttonElement.dataset.originalText || 'Отправить'; // Использовать 'Отправить' как запасной вариант
         buttonElement.disabled = false;
     }
 }
 
-
+// Проверка аутентификации
 function checkAuth() {
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = 'index.html';
+        window.location.href = 'index.html'; // Перенаправить на страницу входа, если токена нет
     }
 }
 
+// Функция выхода
 function logout() {
     localStorage.removeItem('token');
     window.location.href = 'index.html';
 }
 
-
+// Загрузка списка тем
 async function loadTopics() {
     try {
         const topics = await apiRequest('/topics');
-        displayTopics(topics, []);
+        displayTopics(topics, []); // Отобразить темы
     } catch (error) {
-        topicsList.innerHTML = `<li class="p-2 text-center text-red-500">Error loading topics.</li>`;
-        console.error("Error in loadTopics:", error);
+        topicsList.innerHTML = `<li class="p-2 text-center text-red-500">Ошибка загрузки тем.</li>`;
+        console.error("Ошибка в loadTopics:", error);
     }
 }
 
-function displayTopics(topics, allProgress = []) { 
+// Отображение списка тем
+function displayTopics(topics, allProgress = []) { // allProgress пока не используется, но оставлен для будущих улучшений
      if (!Array.isArray(topics)) {
-        console.error("Invalid topics data received:", topics);
-        topicsList.innerHTML = '<li class="p-2 text-center text-red-500">Failed to load topics data.</li>';
+        console.error("Получены неверные данные тем:", topics);
+        topicsList.innerHTML = '<li class="p-2 text-center text-red-500">Не удалось загрузить данные тем.</li>';
         return;
      }
 
     if (topics.length === 0) {
-        topicsList.innerHTML = '<li class="p-2 text-center text-gray-500">No topics yet. Add one!</li>';
+        topicsList.innerHTML = '<li class="p-2 text-center text-gray-500">Тем пока нет. Добавьте одну!</li>';
         return;
     }
 
-
-
+    // Отобразить каждую тему
     topicsList.innerHTML = topics.map(topic => {
-        if (!topic || !topic._id) return ''; 
+        if (!topic || !topic._id) return ''; // Пропустить невалидные темы
 
         return `
             <li class="topic-item p-3 bg-gray-100 hover:bg-gray-200 rounded cursor-pointer mb-2" data-id="${topic._id}">
-                <span class="font-medium mr-2">${topic.name || 'Unnamed Topic'}</span>
-                <!-- Progress display placeholder -->
+                <span class="font-medium mr-2">${topic.name || 'Тема без названия'}</span>
+                <!-- Место для отображения прогресса -->
             </li>
         `;
     }).join('');
 
+    // Добавить обработчики кликов для каждой темы
     document.querySelectorAll('.topic-item').forEach(item => {
         const topicName = item.querySelector('span').textContent;
         item.addEventListener('click', () => loadCardsForTopic(item.dataset.id, topicName));
     });
 }
 
+// Открыть модальное окно добавления темы
 function openAddTopicModal() {
     topicNameInput.value = '';
     topicDescriptionInput.value = '';
     toggleModal(addTopicModal, true);
-    topicNameInput.focus();
+    topicNameInput.focus(); // Установить фокус на поле имени
 }
 
+// Закрыть модальное окно добавления темы
 function closeAddTopicModal() {
     toggleModal(addTopicModal, false);
 }
 
+// Обработка отправки формы добавления темы
 async function handleAddTopicSubmit(event) {
-    event.preventDefault(); 
+    event.preventDefault(); // Предотвратить стандартную отправку формы
     const name = topicNameInput.value.trim();
     const description = topicDescriptionInput.value.trim();
 
-    clearModalError(addTopicError); 
+    clearModalError(addTopicError); // Очистить предыдущие ошибки
 
     if (!name) {
-        displayModalError(addTopicError, 'Topic name is required'); 
+        displayModalError(addTopicError, 'Название темы обязательно'); // Показать ошибку, если имя не введено
         return;
     }
 
@@ -264,127 +269,114 @@ async function handleAddTopicSubmit(event) {
     }
 }
 
-// --- Card Management ---
-async function loadCardsForTopic(topicId, topicName = 'Selected Topic') {
-    currentTopicId = topicId;
-    currentCards = [];
-    currentCardIndex = 0;
-    currentDisplayedCard = null;
-    currentTopicElement.textContent = topicName; 
+// --- Управление карточками ---
 
-    updateUIState('loadingCards');
-
+// Загрузка карточек для выбранной темы
+async function loadCardsForTopic(topicId, topicName = 'Выбранная тема') {
     if (!topicId) {
-        console.error("No Topic ID provided.");
-        updateUIState('welcome'); 
+        console.error("loadCardsForTopic вызван без topicId");
+        updateUIState('error', 'Не удалось загрузить тему. ID не указан.');
         return;
     }
+    currentTopicId = topicId;
+    currentTopicElement.textContent = topicName; // Отобразить имя темы
 
     try {
-        const cards = await apiRequest(`/cards/topic/${topicId}`);
-        currentCards = Array.isArray(cards) ? cards : [];
+        updateUIState('loading');
+        currentCards = await apiRequest(`/topics/${topicId}/cards`); // Загрузить карточки
+        await loadProgressForTopic(topicId); // Загрузить прогресс ПОСЛЕ карточек
 
         if (currentCards.length > 0) {
-            updateUIState('displayingCards');
-            displayCard(currentCards[0], 0, currentCards.length);
+            currentCardIndex = 0;
+            displayCard(currentCards[currentCardIndex], currentCardIndex, currentCards.length); // Отобразить первую карточку
+            updateUIState('cards_loaded');
         } else {
-            updateUIState('noCards');
+            updateUIState('no_cards'); // Показать сообщение, если карточек нет
         }
-        cardElement.classList.remove('flipped');
-        toggleStudyMode(studyModeToggle.checked, true); 
 
+        toggleStudyMode(studyModeToggle.checked, true); // Обновить режим изучения
     } catch (error) {
-        console.error('Error loading cards:', error);
-        updateUIState('noCards'); 
+        console.error(`Ошибка загрузки карточек для темы ${topicId}:`, error);
+        updateUIState('error', `Не удалось загрузить карточки: ${error.message}`);
     }
 }
 
+// Отображение текущей карточки
 function displayCard(card, index, total) {
     if (!card) {
-        console.warn("displayCard called with undefined card");
-        updateUIState('noCards');
+        updateUIState('no_cards'); // Обновить UI, если карточка недействительна
         return;
     }
 
-    currentDisplayedCard = card; 
+    currentDisplayedCard = card; // Сохранить текущую карточку
 
-    cardQuestion.textContent = card.question || '[No Question]';
-    cardAnswer.textContent = card.answer || '[No Answer]';
-    studyCardQuestion.textContent = card.question || '[No Question]';
-    studyCardAnswer.textContent = card.answer || '[No Answer]';
+    cardQuestion.textContent = card.question;
+    cardAnswer.textContent = card.answer;
+    studyCardQuestion.textContent = card.question;
+    studyCardAnswer.textContent = card.answer;
 
-    cardCounter.textContent = `Card ${index + 1} of ${total}`;
-    cardElement.classList.remove('flipped'); 
+    cardCounter.textContent = `${index + 1} / ${total}`; // Обновить счетчик
 
-    prevBtn.disabled = index === 0;
-    nextBtn.disabled = index === total - 1;
+    // Сбросить состояние переворота карточки
+    cardElement.classList.remove('is-flipped');
 
-    aiExplanationContainer.classList.add('hidden');
-    aiExplanationText.textContent = '';
+    updateUIState('cards_loaded'); // Убедиться, что UI находится в правильном состоянии
+    updateCardNavigationButtons(); // Обновить состояние кнопок навигации
+    aiExplanationContainer.classList.add('hidden'); // Скрыть объяснение ИИ при смене карточки
 }
 
+// Обновление состояния UI (отображение/скрытие элементов)
 function updateUIState(state, message = '') {
+    // Сначала скрыть всё, что может конфликтовать
     welcomeContainer.classList.add('hidden');
     flashcardContainer.classList.add('hidden');
-    progressContainer.classList.add('hidden');
     noCardsMessage.classList.add('hidden');
     cardNavigation.classList.add('hidden');
     cardActions.classList.add('hidden');
-    flipCardContainer.classList.add('hidden');
-    studyCardContainer.classList.add('hidden');
-    editCardBtn.classList.add('hidden');
-    deleteCardBtn.classList.add('hidden');
-
-    const noCardsPara = noCardsMessage.querySelector('p'); 
-    const addFirstBtn = document.getElementById('add-first-card-btn');
-    const generateLinkAlt = document.getElementById('generate-cards-link-alt');
-    const orSpan = noCardsMessage.querySelector('span.mx-2'); 
-    if (addFirstBtn) addFirstBtn.classList.add('hidden');
-    if (generateLinkAlt) generateLinkAlt.classList.add('hidden');
-    if (orSpan) orSpan.classList.add('hidden');
+    progressContainer.classList.add('hidden'); // Скрыть прогресс по умолчанию
+    // Добавить сброс ошибок?
 
     switch (state) {
-        case 'welcome':
+        case 'initial':
             welcomeContainer.classList.remove('hidden');
             break;
-        case 'loadingCards':
-            flashcardContainer.classList.remove('hidden');
-             cardQuestion.textContent = "Loading...";
-             cardAnswer.textContent = "Loading...";
-             studyCardQuestion.textContent = "Loading...";
-             studyCardAnswer.textContent = "Loading...";
-             cardCounter.textContent = '';
-             cardActions.classList.remove('hidden'); 
-             break;
-        case 'displayingCards':
+        case 'loading':
+            flashcardContainer.classList.remove('hidden'); // Показать контейнер карточек
+            // Возможно, показать индикатор загрузки внутри flashcardContainer
+            currentTopicElement.textContent = 'Загрузка темы...'; // Сообщение о загрузке
+            break;
+        case 'cards_loaded':
             flashcardContainer.classList.remove('hidden');
             cardNavigation.classList.remove('hidden');
             cardActions.classList.remove('hidden');
-            editCardBtn.classList.remove('hidden'); 
-            deleteCardBtn.classList.remove('hidden');
-            toggleStudyMode(studyModeToggle.checked, true); 
+            progressContainer.classList.remove('hidden'); // Показать прогресс при загрузке карточек
+            // Скрыть/показать flip/study контейнеры в зависимости от режима
+            toggleStudyMode(studyModeToggle.checked, true);
             break;
-        case 'noCards':
-            flashcardContainer.classList.remove('hidden');
+        case 'no_cards':
+            flashcardContainer.classList.remove('hidden'); // Показать контейнер, но с сообщением
             noCardsMessage.classList.remove('hidden');
-            if (noCardsPara) noCardsPara.textContent = 'No cards available for this topic.';
-            if (addFirstBtn) addFirstBtn.classList.remove('hidden'); 
-            if (generateLinkAlt) generateLinkAlt.classList.remove('hidden');
-            if (orSpan) orSpan.classList.remove('hidden');
-            cardActions.classList.remove('hidden'); 
-            cardCounter.textContent = 'Card 0 of 0';
+            cardActions.classList.remove('hidden'); // Показать действия (Добавить карточку)
+            progressContainer.classList.remove('hidden'); // Показать прогресс (0/0)
             break;
-        case 'topicFinished': 
-            flashcardContainer.classList.remove('hidden');
+        case 'error':
+            flashcardContainer.classList.remove('hidden'); // Показать контейнер для сообщения об ошибке
+            currentTopicElement.textContent = 'Ошибка';
+            // Отобразить сообщение об ошибке (нужен специальный элемент?)
+            noCardsMessage.textContent = message || 'Произошла ошибка.'; // Переиспользовать noCardsMessage для ошибки
             noCardsMessage.classList.remove('hidden');
-            if (noCardsPara) noCardsPara.textContent = message; 
-            cardActions.classList.add('hidden'); 
-            cardCounter.textContent = ''; 
+            noCardsMessage.classList.add('text-red-500'); // Стиль ошибки
             break;
     }
 }
 
+// Обновление состояния кнопок навигации (< >)
+function updateCardNavigationButtons() {
+    prevBtn.disabled = currentCardIndex <= 0;
+    nextBtn.disabled = currentCardIndex >= currentCards.length - 1;
+}
 
+// Переход к следующей карточке
 function nextCard() {
     if (currentCardIndex < currentCards.length - 1) {
         currentCardIndex++;
@@ -392,6 +384,7 @@ function nextCard() {
     }
 }
 
+// Переход к предыдущей карточке
 function prevCard() {
     if (currentCardIndex > 0) {
         currentCardIndex--;
@@ -399,100 +392,100 @@ function prevCard() {
     }
 }
 
+// Переворот текущей карточки
 function flipCard() {
-     if (!studyModeToggle.checked) {
-         cardElement.classList.toggle('flipped');
-     }
-}
-
-function toggleStudyMode(isStudyMode, forceUpdate = false) {
-    const mode = forceUpdate ? isStudyMode : studyModeToggle.checked;
-
-     if (mode) { 
-         flipCardContainer.classList.add('hidden');
-         if (currentCards.length > 0) { 
-             studyCardContainer.classList.remove('hidden');
-         }
-     } else { 
-         studyCardContainer.classList.add('hidden');
-         if (currentCards.length > 0) { 
-             flipCardContainer.classList.remove('hidden');
-             cardElement.classList.remove('flipped'); 
-         }
-     }
-     if (forceUpdate && studyModeToggle.checked !== mode) {
-        studyModeToggle.checked = mode;
-     }
-}
-
-function openAddCardModal() {
-    if (!currentTopicId) {
-        console.error("Please select a topic first.");
-        return;
+    if (cardElement) {
+        cardElement.classList.toggle('is-flipped');
     }
-    addCardForm.reset();
+}
+
+// Переключение режима изучения
+function toggleStudyMode(isStudyMode, forceUpdate = false) {
+    if (!forceUpdate && studyModeToggle.checked === isStudyMode) return; // Не делать ничего, если состояние не изменилось
+
+    studyModeToggle.checked = isStudyMode; // Синхронизировать чекбокс
+
+    if (isStudyMode) {
+        flipCardContainer.classList.add('hidden');
+        studyCardContainer.classList.remove('hidden');
+        cardActions.classList.add('hidden'); // Скрыть Добавить/Редактировать/Удалить в режиме изучения
+    } else {
+        flipCardContainer.classList.remove('hidden');
+        studyCardContainer.classList.add('hidden');
+        if (currentCards.length > 0) {
+            cardActions.classList.remove('hidden'); // Показать действия, если есть карточки
+        }
+    }
+    // Убедиться, что правильные элементы видны при переключении
+    if (currentCards.length === 0 && !isStudyMode) {
+         updateUIState('no_cards'); // Вернуться к состоянию "нет карточек", если мы не в режиме изучения
+    } else if (currentCards.length > 0) {
+         updateUIState('cards_loaded'); // Обновить UI для отображения карточек/контейнеров
+    }
+}
+
+// Открыть модальное окно добавления карточки
+function openAddCardModal() {
+    if (!currentTopicId) return; // Не открывать, если тема не выбрана
+    addCardQuestionInput.value = '';
+    addCardAnswerInput.value = '';
     clearModalError(addCardError);
     toggleModal(addCardModal, true);
     addCardQuestionInput.focus();
 }
 
+// Закрыть модальное окно добавления карточки
 function closeAddCardModal() {
     toggleModal(addCardModal, false);
 }
 
+// Открыть модальное окно редактирования карточки
 function openEditCardModal() {
-    if (!currentDisplayedCard) {
-        console.error('No card selected to edit.');
-        return;
-    }
-    editCardForm.reset();
+    if (!currentDisplayedCard) return; // Не открывать, если карточка не отображена
     editCardIdInput.value = currentDisplayedCard._id;
     editCardQuestionInput.value = currentDisplayedCard.question;
     editCardAnswerInput.value = currentDisplayedCard.answer;
     clearModalError(editCardError);
     toggleModal(editCardModal, true);
-     editCardQuestionInput.focus();
+    editCardQuestionInput.focus();
 }
 
+// Закрыть модальное окно редактирования карточки
 function closeEditCardModal() {
     toggleModal(editCardModal, false);
 }
 
+// Обработка отправки формы добавления карточки
 async function handleAddCardSubmit(event) {
     event.preventDefault();
     const question = addCardQuestionInput.value.trim();
     const answer = addCardAnswerInput.value.trim();
 
-    clearModalError(addCardError); 
+    clearModalError(addCardError);
+
     if (!question || !answer) {
-        displayModalError(addCardError, 'Question and Answer cannot be empty.');
+        displayModalError(addCardError, 'Вопрос и ответ обязательны');
         return;
     }
 
-    if (!currentTopicId) {
-         console.error('No topic selected.');
-         return;
-    }
-
-    toggleButtonLoading(confirmAddCardBtn, true, 'Adding...');
+    toggleButtonLoading(confirmAddCardBtn, true);
 
     try {
-        const newCard = await apiRequest('/cards', 'POST', { topicId: currentTopicId, question, answer });
-        console.log('Card added successfully!');
+        const newCard = await apiRequest(`/topics/${currentTopicId}/cards`, 'POST', { question, answer });
         closeAddCardModal();
-
-        currentCards.push(newCard); // Add to the end
-        currentCardIndex = currentCards.length - 1; // Go to the new card
-        updateUIState('displayingCards');
+        // Добавить новую карточку локально и обновить UI
+        currentCards.push(newCard); // Добавить в конец
+        currentCardIndex = currentCards.length - 1; // Перейти к новой карточке
         displayCard(newCard, currentCardIndex, currentCards.length);
-
+        updateProgressDisplay(); // Обновить отображение прогресса
     } catch (error) {
-        displayModalError(addCardError, error.message || 'Failed to add card.');
+        displayModalError(addCardError, `Не удалось добавить карточку: ${error.message}`);
     } finally {
-        toggleButtonLoading(confirmAddCardBtn, false);
+        toggleButtonLoading(confirmAddCardBtn, false, null, 'Add Card');
     }
 }
 
+// Обработка отправки формы редактирования карточки
 async function handleEditCardSubmit(event) {
     event.preventDefault();
     const cardId = editCardIdInput.value;
@@ -502,164 +495,147 @@ async function handleEditCardSubmit(event) {
     clearModalError(editCardError);
 
     if (!question || !answer) {
-        displayModalError(editCardError, 'Question and Answer cannot be empty.');
+        displayModalError(editCardError, 'Вопрос и ответ обязательны');
         return;
     }
 
-    if (!cardId) {
-        console.error('Card ID is missing. Cannot update.');
-        return;
-    }
-
-    toggleButtonLoading(confirmEditCardBtn, true, 'Saving...');
+    toggleButtonLoading(confirmEditCardBtn, true);
 
     try {
-        // API expects question, answer in body for PUT /api/cards/:id
+        // API ожидает question, answer в теле для PUT /api/cards/:id
         const updatedCard = await apiRequest(`/cards/${cardId}`, 'PUT', { question, answer });
-        console.log('Card updated successfully!');
         closeEditCardModal();
 
-        // Update the card in the local array
-        const indexToUpdate = currentCards.findIndex(c => c._id === cardId);
+        // Обновить карточку в локальном массиве
+        const indexToUpdate = currentCards.findIndex(card => card._id === cardId);
         if (indexToUpdate !== -1) {
-            // Merge updates, assuming API returns the full updated card
-            currentCards[indexToUpdate] = { ...currentCards[indexToUpdate], ...updatedCard, question, answer }; // Ensure local fields are updated even if PUT returns no body
-            currentCardIndex = indexToUpdate; // Stay on the edited card
-            updateUIState('displayingCards');
+            // Слить обновления, предполагая, что API возвращает полную обновленную карточку
+            currentCards[indexToUpdate] = { ...currentCards[indexToUpdate], ...updatedCard, question, answer }; // Убедиться, что локальные поля обновлены, даже если PUT не возвращает тело
+            currentCardIndex = indexToUpdate; // Остаться на отредактированной карточке
             displayCard(currentCards[currentCardIndex], currentCardIndex, currentCards.length);
         } else {
-            // Card not found locally, perhaps reload everything as a fallback
-            console.warn("Edited card not found in local array, reloading topic.");
+            // Карточка не найдена локально, возможно, перезагрузить всё как запасной вариант
+            console.warn("Отредактированная карточка не найдена локально, перезагрузка...");
             loadCardsForTopic(currentTopicId, currentTopicElement.textContent);
         }
-
     } catch (error) {
-         displayModalError(editCardError, error.message || 'Failed to update card.');
+        displayModalError(editCardError, `Не удалось обновить карточку: ${error.message}`);
     } finally {
-        toggleButtonLoading(confirmEditCardBtn, false);
+        toggleButtonLoading(confirmEditCardBtn, false, null, 'Save Changes');
     }
 }
 
+// Удаление текущей карточки
 async function handleDeleteCard() {
-    if (!currentDisplayedCard) {
-        console.error('No card selected to delete.');
-        return;
-    }
-    const cardId = currentDisplayedCard._id;
-    const cardQuestionPreview = currentDisplayedCard.question.substring(0, 30) + (currentDisplayedCard.question.length > 30 ? '...' : '');
+    if (!currentDisplayedCard) return;
 
-    // Use a more robust confirmation later if needed
-    if (!confirm(`Are you sure you want to delete the card: "${cardQuestionPreview}"? This cannot be undone.`)) {
+    // Использовать более надежное подтверждение позже, если необходимо
+    if (!confirm(`Вы уверены, что хотите удалить эту карточку?
+Вопрос: ${currentDisplayedCard.question}`)) {
         return;
     }
+
+    const cardIdToDelete = currentDisplayedCard._id;
+    const deletedIndex = currentCardIndex;
 
     try {
-        await apiRequest(`/cards/${cardId}`, 'DELETE');
-        console.log('Card deleted successfully!');
+        await apiRequest(`/cards/${cardIdToDelete}`, 'DELETE');
 
-        // Remove card from local array
-        const deletedIndex = currentCards.findIndex(c => c._id === cardId);
-        if(deletedIndex !== -1) {
-            currentCards.splice(deletedIndex, 1);
-        }
+        // Удалить карточку из локального массива
+        currentCards.splice(deletedIndex, 1);
 
-        // Adjust index and refresh UI
+        // Скорректировать индекс и обновить UI
         if (currentCards.length === 0) {
-             updateUIState('noCards');
-             currentDisplayedCard = null; // Clear selection
+            currentDisplayedCard = null; // Очистить выбор
+            updateUIState('no_cards');
         } else {
-            // Show previous card or first card if the deleted one was the first/only one left
-            currentCardIndex = Math.max(0, deletedIndex - 1); // Go to previous or 0
-             updateUIState('displayingCards');
-             displayCard(currentCards[currentCardIndex], currentCardIndex, currentCards.length);
+            // Показать предыдущую карточку или первую, если удалена первая/единственная оставшаяся
+            currentCardIndex = Math.max(0, deletedIndex - 1); // Перейти к предыдущей или 0
+            displayCard(currentCards[currentCardIndex], currentCardIndex, currentCards.length);
         }
+        updateProgressDisplay(); // Обновить прогресс после удаления
     } catch (error) {
-        console.error(error.message || 'Failed to delete card.');
+        console.error("Ошибка удаления карточки:", error);
+        // Отобразить сообщение об ошибке пользователю?
+        alert(`Не удалось удалить карточку: ${error.message}`);
     }
 }
 
-// --- Progress Management ---
+// --- Управление прогрессом ---
+
+// Загрузка прогресса для темы
 async function loadProgressForTopic(topicId) {
     if (!topicId) return;
     try {
-        const progressData = await apiRequest(`/progress/topic/${topicId}`);
+        const progressData = await apiRequest(`/topics/${topicId}/progress`) || { knownCount: 0, unknownCount: 0 }; // По умолчанию 0, если нет прогресса
         progress = {
             knownCount: progressData.knownCount || 0,
             unknownCount: progressData.unknownCount || 0,
-            // knownCardIds: progressData.knownCardIds || [], // Optional: if needed for UI logic
+            // knownCardIds: progressData.knownCardIds || [], // Опционально: если нужно для логики UI
             // unknownCardIds: progressData.unknownCardIds || []
         };
-        updateProgressDisplay();
-        progressContainer.classList.remove('hidden');
+        updateProgressDisplay(); // Обновить отображение
+        progressContainer.classList.remove('hidden'); // Убедиться, что контейнер видим
     } catch (error) {
-        console.error("Error loading progress:", error);
-        // Reset progress on error
+        console.error("Не удалось загрузить прогресс:", error);
+        // Сбросить прогресс при ошибке
         progress = { knownCount: 0, unknownCount: 0 };
         updateProgressDisplay();
-        // Decide if progress container should be hidden on error
+        // Решить, нужно ли скрывать контейнер прогресса при ошибке
         // progressContainer.classList.add('hidden');
     }
 }
 
+// Обновление отображения прогресса (полоса, текст)
 function updateProgressDisplay() {
-    if (progressContainer.classList.contains('hidden')) return;
+    const known = progress.knownCount || 0;
+    const unknown = progress.unknownCount || 0;
+    // Рассчитать процент только на основе отмеченных карточек
+    const totalMarked = known + unknown;
+    const percentage = totalMarked > 0 ? Math.round((known / totalMarked) * 100) : 0;
 
-    const total = progress.knownCount + progress.unknownCount;
-    // Calculate percentage based only on cards that have been marked
-    const markedTotal = currentCards.filter(c => 
-        (progress.knownCardIds && progress.knownCardIds.includes(c._id)) || 
-        (progress.unknownCardIds && progress.unknownCardIds.includes(c._id))
-    ).length;
-    // ^^ This requires known/unknownCardIds from backend, let's simplify for now
-    // Let's base progress on known/total for now
-    const displayTotal = currentCards.length; // Base percentage on total cards in topic
-    const percentComplete = displayTotal === 0 ? 0 : Math.round((progress.knownCount / displayTotal) * 100);
+    // ^^ Это требует known/unknownCardIds от бэкенда, пока упростим
+    // Давайте пока будем основывать прогресс на известных/общем количестве
+    const displayTotal = currentCards.length; // Основывать процент на общем количестве карточек в теме
+    const displayKnown = known; // Использовать известное количество из API
+    const displayPercentage = displayTotal > 0 ? Math.round((displayKnown / displayTotal) * 100) : 0;
 
-    progressBar.style.width = `${percentComplete}%`;
-    progressPercentage.textContent = `${percentComplete}%`;
-    progressRatio.textContent = `${progress.knownCount}/${displayTotal}`;
+    progressBar.style.width = `${displayPercentage}%`;
+    progressPercentage.textContent = `${displayPercentage}%`;
+    progressRatio.textContent = `(${displayKnown} / ${displayTotal})`;
+    progressContainer.classList.toggle('hidden', displayTotal === 0); // Скрыть, если нет карточек
 }
 
-// *** Function to mark card as known/unknown ***
+// *** Функция для отметки карточки как изученной/неизученной ***
 async function markCard(status) {
-    if (!currentDisplayedCard || !currentTopicId) return; // Ensure card and topic are selected
-
+    if (!currentDisplayedCard || !currentTopicId) return; // Убедиться, что карточка и тема выбраны
     const cardId = currentDisplayedCard._id;
 
     try {
-        // Send update to backend
-        const updatedProgress = await apiRequest(`/progress/topic/${currentTopicId}`, 'POST', {
-            cardId: cardId,
-            status: status
-        });
+        // Отправить обновление на бэкенд
+        const updatedProgress = await apiRequest(`/cards/${cardId}/mark`, 'POST', { status }); // status = 'known' или 'unknown'
 
-        // Update local progress state from the response
-        progress = {
-            knownCount: updatedProgress.knownCount || 0,
-            unknownCount: updatedProgress.unknownCount || 0
-        };
-        updateProgressDisplay(); // Update the progress bar
-
-        const wasLastCard = currentCardIndex === currentCards.length - 1;
-
-        if (!wasLastCard) {
-            nextCard();
-        } else {
-            const totalCards = currentCards.length;
-            const percentComplete = totalCards === 0 ? 0 : Math.round((progress.knownCount / totalCards) * 100);
-            const completionMessage = `Topic finished! Progress: ${percentComplete}% (${progress.knownCount}/${totalCards} known)`;
-            updateUIState('topicFinished', completionMessage);
+        // Обновить локальное состояние прогресса из ответа
+        if (updatedProgress) {
+             progress = {
+                knownCount: updatedProgress.knownCount || 0,
+                unknownCount: updatedProgress.unknownCount || 0
+            };
         }
-
+        updateProgressDisplay(); // Обновить полосу прогресса
+        // Переход к следующей карточке? (Опционально, можно добавить как настройку)
+        // nextCard();
     } catch (error) {
-        console.error("Error marking card:", error);
+        console.error(`Не удалось отметить карточку как ${status}:`, error);
+        // Сообщить пользователю об ошибке?
+        alert(`Не удалось обновить статус карточки: ${error.message}`);
     }
 }
 
-
-// --- Generator Modal ---
+// --- Модальное окно генератора ---
+// Открыть модальное окно генерации
 function openGenerateModal(topicName = '') {
-    generateTopicInput.value = topicName || ''; // Pre-fill if name provided
+    generateTopicInput.value = topicName || ''; // Предзаполнить, если имя предоставлено
     generateCountSelect.value = '10';
     clearModalError(generateError);
     generationProgress.classList.add('hidden');
@@ -667,10 +643,12 @@ function openGenerateModal(topicName = '') {
     generateTopicInput.focus();
 }
 
+// Закрыть модальное окно генерации
 function closeGenerateModal() {
     toggleModal(generateModal, false);
 }
 
+// Обработка отправки формы генерации
 async function handleGenerateSubmit(event) {
     event.preventDefault();
     const topic = generateTopicInput.value.trim();
@@ -679,71 +657,71 @@ async function handleGenerateSubmit(event) {
     clearModalError(generateError);
 
     if (!topic) {
-        displayModalError(generateError, 'Topic name is required.');
+        displayModalError(generateError, 'Название темы обязательно.');
         return;
     }
 
-    toggleButtonLoading(confirmGenerateBtn, true, 'Generating...');
-    cancelGenerateBtn.disabled = true; // Disable cancel during generation
-    generationProgress.classList.remove('hidden'); // Show progress indicator
-    generationProgressBar.style.width = '0%'; // Reset progress bar
-    // Simulate progress for better UX (optional)
+    toggleButtonLoading(confirmGenerateBtn, true, 'Генерация...');
+    cancelGenerateBtn.disabled = true; // Отключить отмену во время генерации
+    generationProgress.classList.remove('hidden'); // Показать индикатор прогресса
+    generationProgressBar.style.width = '0%'; // Сбросить полосу прогресса
+    // Симуляция прогресса для лучшего UX (опционально)
     let progressInterval = setInterval(() => {
         let currentWidth = parseFloat(generationProgressBar.style.width);
-        if (currentWidth < 90) { // Simulate progress up to 90%
+        if (currentWidth < 90) { // Симулировать прогресс до 90%
             generationProgressBar.style.width = (currentWidth + 5) + '%';
         }
     }, 200);
 
     try {
-        // Call the generate API (returns cards only)
+        // Вызвать API генерации (возвращает только карточки)
         const generatedData = await apiRequest('/generate', 'POST', { topic, count });
 
-        clearInterval(progressInterval); // Stop simulation
-        generationProgressBar.style.width = '100%'; // Mark as complete
+        clearInterval(progressInterval); // Остановить симуляцию
+        generationProgressBar.style.width = '100%'; // Отметить как завершенное
 
         if (!generatedData || !Array.isArray(generatedData.cards) || generatedData.cards.length === 0) {
-             throw new Error("AI failed to generate valid cards.");
+             throw new Error("ИИ не смог сгенерировать валидные карточки.");
         }
 
-        // Save the generated cards (posts to /generate/save)
-        // Add a small delay before saving to show 100% progress briefly
-        await new Promise(resolve => setTimeout(resolve, 300)); 
-        
+        // Сохранить сгенерированные карточки (отправляет POST на /generate/save)
+        // Добавить небольшую задержку перед сохранением, чтобы показать 100% прогресс
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         const saveData = await apiRequest('/generate/save', 'POST', {
             topicName: topic,
-            // topicDescription: `Generated cards about ${topic}`, // Optional description
+            // topicDescription: `Сгенерированные карточки о ${topic}`, // Опциональное описание
             cards: generatedData.cards
         });
 
-        console.log(saveData.message || `Generated and saved ${generatedData.cards.length} cards for "${topic}"!`);
+        console.log(saveData.message || `Сгенерировано и сохранено ${generatedData.cards.length} карточек для "${topic}"!`);
         closeGenerateModal();
-        loadTopics(); // Refresh topics list to include the new one
+        loadTopics(); // Обновить список тем, чтобы включить новую
 
-        // Optionally, load the newly generated topic immediately
+        // Опционально: немедленно загрузить новую сгенерированную тему
         if (saveData.topic && saveData.topic._id) {
             loadCardsForTopic(saveData.topic._id, saveData.topic.name);
         }
 
     } catch (error) {
-        clearInterval(progressInterval); // Stop simulation on error
-        displayModalError(generateError, error.message || 'Failed to generate cards.');
-        generationProgress.classList.add('hidden'); // Hide progress on error
+        clearInterval(progressInterval); // Остановить симуляцию при ошибке
+        displayModalError(generateError, error.message || 'Не удалось сгенерировать карточки.');
+        generationProgress.classList.add('hidden'); // Скрыть прогресс при ошибке
     } finally {
         toggleButtonLoading(confirmGenerateBtn, false);
-        cancelGenerateBtn.disabled = false; // Re-enable cancel
-         // Reset progress bar after a short delay if modal is not closed automatically
+        cancelGenerateBtn.disabled = false; // Включить отмену снова
+         // Сбросить полосу прогресса после небольшой задержки, если модальное окно не закрывается автоматически
         setTimeout(() => {
-            generationProgressBar.style.width = '0%'; 
-            generationProgress.classList.add('hidden'); 
-        }, 1000); 
+            generationProgressBar.style.width = '0%';
+            generationProgress.classList.add('hidden');
+        }, 1000);
     }
 }
 
-// *** Function to handle AI Explanation Request ***
+// *** Функция для обработки запроса на объяснение ИИ ***
 async function handleExplainAI() {
     if (!currentDisplayedCard) {
-        console.error("Cannot explain: No card selected.");
+        console.error("Не могу объяснить: карточка не выбрана.");
         return;
     }
 
@@ -754,7 +732,7 @@ async function handleExplainAI() {
     explainAiBtn.classList.add('active');
     explainAiBtn.classList.add('text-yellow-600');
     explainAiBtn.classList.add('bg-yellow-100');
-    
+
     // Показываем контейнер объяснения
     aiExplanationContainer.classList.remove('hidden');
     aiExplanationText.textContent = 'Генерация объяснения...';
@@ -764,12 +742,12 @@ async function handleExplainAI() {
         if (data && data.explanation) {
             aiExplanationText.textContent = data.explanation;
         } else {
-             aiExplanationText.textContent = 'Could not get an explanation.';
-             console.error("Failed to get explanation from AI.");
+             aiExplanationText.textContent = 'Не удалось получить объяснение.';
+             console.error("Не удалось получить объяснение от ИИ.");
         }
     } catch (error) {
-        aiExplanationText.textContent = `Error: ${error.message}`;
-        console.error(`Failed to get explanation: ${error.message}`);
+        aiExplanationText.textContent = `Ошибка: ${error.message}`;
+        console.error(`Не удалось получить объяснение: ${error.message}`);
     } finally {
         // Удаляем класс подсветки после завершения запроса
         setTimeout(() => {
@@ -780,83 +758,83 @@ async function handleExplainAI() {
     }
 }
 
-// --- Initialization ---
+// --- Инициализация ---
 function initializeDashboard() {
-    // Basic Setup
-    checkAuth(); // Ensure user is logged in
+    // Базовая настройка
+    checkAuth(); // Убедиться, что пользователь вошел в систему
 
-    // Event Listeners - Logout
+    // Обработчики событий - Выход
     logoutBtn.addEventListener('click', logout);
 
-    // Event Listeners - Topics
+    // Обработчики событий - Темы
     addTopicBtn.addEventListener('click', openAddTopicModal);
-    welcomeAddTopicBtn.addEventListener('click', openAddTopicModal); // Button on welcome screen
+    welcomeAddTopicBtn.addEventListener('click', openAddTopicModal); // Кнопка на экране приветствия
     cancelAddTopicBtn.addEventListener('click', closeAddTopicModal);
-    addTopicForm.addEventListener('submit', handleAddTopicSubmit); // NEW listener on form
+    addTopicForm.addEventListener('submit', handleAddTopicSubmit); // НОВЫЙ обработчик на форме
 
-    // Event Listeners - Card Generation
-    generateBtn.addEventListener('click', () => openGenerateModal()); // Nav button
-    welcomeGenerateBtn.addEventListener('click', () => openGenerateModal()); // Welcome screen button
-    generateCardsLinkAlt.addEventListener('click', () => openGenerateModal(currentTopicElement.textContent)); // Link in no-cards message
+    // Обработчики событий - Генерация карточек
+    generateBtn.addEventListener('click', () => openGenerateModal()); // Кнопка навигации
+    welcomeGenerateBtn.addEventListener('click', () => openGenerateModal()); // Кнопка на экране приветствия
+    generateCardsLinkAlt.addEventListener('click', () => openGenerateModal(currentTopicElement.textContent)); // Ссылка в сообщении "нет карточек"
     cancelGenerateBtn.addEventListener('click', closeGenerateModal);
-    generateForm.addEventListener('submit', handleGenerateSubmit); // NEW listener on form
+    generateForm.addEventListener('submit', handleGenerateSubmit); // НОВЫЙ обработчик на форме
 
-    // Event Listeners - Flashcard Interaction
+    // Обработчики событий - Взаимодействие с карточками
     flipCardContainer.addEventListener('click', (event) => {
-         // Only flip if in flip mode and clicking the card itself
-         if (!studyModeToggle.checked && 
-             (event.target === cardFront || event.target === cardBack || 
+         // Переворачивать только в режиме переворота и при клике на саму карточку
+         if (!studyModeToggle.checked &&
+             (event.target === cardFront || event.target === cardBack ||
              event.target.closest('.card-front') || event.target.closest('.card-back'))) {
-              // Prevent marking when clicking to flip initially
-             if (!cardElement.classList.contains('flipped')) {
+              // Предотвратить отметку при клике для первоначального переворота
+             if (!cardElement.classList.contains('is-flipped')) {
                   flipCard();
              }
          }
     });
-    
-    // *** Add listener specifically for marking on the card back ***
+
+    // *** Добавить обработчик специально для отметки на обратной стороне карточки ***
     cardBack.addEventListener('click', function(e) {
-        // Only trigger if in flip mode AND card is actually flipped
-        if (studyModeToggle.checked || !cardElement.classList.contains('flipped')) return; 
-        
-        // Ignore clicks directly on the AI explanation button
+        // Срабатывать только в режиме переворота И если карточка действительно перевернута
+        if (studyModeToggle.checked || !cardElement.classList.contains('is-flipped')) return;
+
+        // Игнорировать клики непосредственно на кнопке объяснения ИИ
         if (e.target.closest('#explain-ai-btn')) return;
-        
+
         const rect = cardBack.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const status = (x < rect.width / 2) ? 'unknown' : 'known';
         const flashClass = (status === 'unknown') ? 'flash-red' : 'flash-green';
-        
-        // Add visual flash to the ENTIRE card back
+
+        // Добавить визуальную вспышку ко ВСЕЙ обратной стороне карточки
         cardBack.classList.add(flashClass);
-        setTimeout(() => cardBack.classList.remove(flashClass), 300); // Remove class after animation
-        
-        // Mark card and potentially advance
+        setTimeout(() => cardBack.classList.remove(flashClass), 300); // Убрать класс после анимации
+
+        // Отметить карточку и потенциально перейти к следующей
         markCard(status);
     });
-    
-    // *** Add listener for marking in Study Mode ***
+
+    // *** Добавить обработчик для отметки в режиме изучения ***
     studyCardContainer.addEventListener('click', function(e) {
-        // Only trigger if in study mode
-        if (!studyModeToggle.checked) return; 
-        
+        // Срабатывать только в режиме изучения
+        if (!studyModeToggle.checked) return;
+
         const innerCard = e.target.closest('.study-card-inner');
         if (!innerCard) return;
-        
+
         const rect = innerCard.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const isLeftSide = x < rect.width / 2;
-        
+
         // Определяем, на какой стороне был клик и какой элемент будем подсвечивать
         if (isLeftSide) {
-            // Clicking on question side (left) - mark as unknown (red)
+            // Клик по стороне вопроса (левая) - отметить как неизвестно (красный)
             // Подсвечиваем всю левую половину карточки
             const questionSide = innerCard.querySelector('.study-card-question');
             questionSide.classList.add('flash-red');
             setTimeout(() => questionSide.classList.remove('flash-red'), 300);
             markCard('unknown');
         } else {
-            // Clicking on answer side (right) - mark as known (green)
+            // Клик по стороне ответа (правая) - отметить как известно (зеленый)
             // Подсвечиваем всю правую половину карточки
             const answerSide = innerCard.querySelector('.study-card-answer');
             answerSide.classList.add('flash-green');
@@ -864,15 +842,15 @@ function initializeDashboard() {
             markCard('known');
         }
     });
-    
+
 
     nextBtn.addEventListener('click', nextCard);
     prevBtn.addEventListener('click', prevCard);
-    studyModeToggle.addEventListener('change', () => toggleStudyMode(studyModeToggle.checked, true)); // Update UI on change
+    studyModeToggle.addEventListener('change', () => toggleStudyMode(studyModeToggle.checked, true)); // Обновить UI при изменении
 
-    // Event Listeners - Add/Edit/Delete Card Modals & Actions
-    addCardBtn.addEventListener('click', openAddCardModal); // Button in card actions
-    addFirstCardBtn.addEventListener('click', openAddCardModal); // Button in no-cards message
+    // Обработчики событий - Модальные окна и действия Добавить/Редактировать/Удалить карточку
+    addCardBtn.addEventListener('click', openAddCardModal); // Кнопка в действиях с карточкой
+    addFirstCardBtn.addEventListener('click', openAddCardModal); // Кнопка в сообщении "нет карточек"
     cancelAddCardBtn.addEventListener('click', closeAddCardModal);
     addCardForm.addEventListener('submit', handleAddCardSubmit);
 
@@ -882,16 +860,16 @@ function initializeDashboard() {
 
     deleteCardBtn.addEventListener('click', handleDeleteCard);
 
-    // *** Add Event Listener for AI Explain Button ***
+    // *** Добавить обработчик событий для кнопки объяснения ИИ ***
     explainAiBtn.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent click from bubbling up to cardBack marking listener
+        event.stopPropagation(); // Предотвратить всплытие клика до обработчика отметки cardBack
         handleExplainAI();
     });
 
-    // Initial Load
-    loadTopics(); // Load topics when dashboard initializes
-    updateUIState('welcome'); // Start with the welcome message visible
+    // Начальная загрузка
+    loadTopics(); // Загрузить темы при инициализации панели управления
+    updateUIState('welcome'); // Начать с видимого приветственного сообщения
 }
 
-// Initialize the dashboard when the DOM is ready
+// Инициализировать панель управления, когда DOM готов
 document.addEventListener('DOMContentLoaded', initializeDashboard); 

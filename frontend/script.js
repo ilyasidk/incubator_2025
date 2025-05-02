@@ -1,10 +1,10 @@
-// Basic script placeholder
+// Базовый плейсхолдер скрипта
 console.log("Flashcards Master frontend script loaded.");
 
-// Configuration
+// Конфигурация
 const API_URL = '/api';
 
-// DOM Elements
+// Элементы DOM
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const registerLink = document.getElementById('register-link');
@@ -14,36 +14,36 @@ const registerButton = document.getElementById('register-button');
 const errorMessage = document.getElementById('error-message');
 const registerErrorMessage = document.getElementById('register-error-message');
 
-// Event Listeners
+// Обработчики событий
 window.addEventListener('DOMContentLoaded', () => {
-    // Check if user is already logged in
+    // Проверить, авторизован ли пользователь
     const token = localStorage.getItem('token');
     if (token) {
         redirectToDashboard();
     }
     
-    // Show register form
+    // Показать форму регистрации
     registerLink.addEventListener('click', (e) => {
         e.preventDefault();
         loginForm.classList.add('hidden');
         registerForm.classList.remove('hidden');
     });
     
-    // Show login form
+    // Показать форму входа
     loginLink.addEventListener('click', (e) => {
         e.preventDefault();
         registerForm.classList.add('hidden');
         loginForm.classList.remove('hidden');
     });
     
-    // Login form submission
+    // Отправка формы входа
     loginButton.addEventListener('click', handleLogin);
     
-    // Register form submission
+    // Отправка формы регистрации
     registerButton.addEventListener('click', handleRegister);
 });
 
-// Handle login form submission
+// Обработка отправки формы входа
 async function handleLogin() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -71,10 +71,10 @@ async function handleLogin() {
             throw new Error(data.message || 'Login failed');
         }
         
-        // Save token to local storage
+        // Сохранить токен в локальное хранилище
         localStorage.setItem('token', data.token);
         
-        // Redirect to dashboard
+        // Перенаправить на панель управления
         redirectToDashboard();
         
     } catch (error) {
@@ -84,7 +84,7 @@ async function handleLogin() {
     }
 }
 
-// Handle register form submission
+// Обработка отправки формы регистрации
 async function handleRegister() {
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
@@ -118,10 +118,10 @@ async function handleRegister() {
             throw new Error(data.message || 'Registration failed');
         }
         
-        // Save token to local storage
+        // Сохранить токен в локальное хранилище
         localStorage.setItem('token', data.token);
         
-        // Redirect to dashboard
+        // Перенаправить на панель управления
         redirectToDashboard();
         
     } catch (error) {
@@ -131,20 +131,20 @@ async function handleRegister() {
     }
 }
 
-// Helper function to show error messages
+// Вспомогательная функция для отображения сообщений об ошибках
 function showError(element, message) {
     element.textContent = message;
     element.classList.remove('hidden');
     
-    // Hide error after 5 seconds
+    // Скрыть ошибку через 5 секунд
     setTimeout(() => {
         element.classList.add('hidden');
     }, 5000);
 }
 
-// Helper function to redirect to dashboard
+// Вспомогательная функция для перенаправления на панель управления
 function redirectToDashboard() {
     window.location.href = 'dashboard.html';
 }
 
-// TODO: Add frontend logic for auth, fetching cards, displaying cards, handling interactions, etc. 
+// TODO: Добавить фронтенд-логику для аутентификации, получения карточек, отображения карточек, обработки взаимодействий и т.д. 

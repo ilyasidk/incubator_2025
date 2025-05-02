@@ -1,20 +1,20 @@
 module.exports = {
   content: [
     "./*.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // Include JS files in src folder
+    "./src/**/*.{js,ts,jsx,tsx}", // Включить JS-файлы из папки src
   ],
   theme: {
     extend: {
       colors: {
-        // Define custom colors here
+        // Определите пользовательские цвета здесь
         primary: {
-          DEFAULT: '#3B82F6', // Example: Blue 500
-          dark: '#2563EB',    // Example: Blue 600 for hover/focus
+          DEFAULT: '#3B82F6', // Пример: Синий 500
+          dark: '#2563EB',    // Пример: Синий 600 для наведения/фокуса
         },
-        // You can add other custom colors if needed
+        // При необходимости можно добавить другие пользовательские цвета
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Example: Setting Inter as default sans-serif font
+        sans: ['Inter', 'sans-serif'], // Пример: Установка Inter как шрифта sans-serif по умолчанию
       },
     },
   },

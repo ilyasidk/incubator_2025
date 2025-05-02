@@ -5,10 +5,10 @@ const Topic = require('../models/Topic');
 const Card = require('../models/Card');
 const auth = require('../middleware/auth');
 
-// Setup Gemini
+// Настройка Gemini
 const setupGemini = () => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Configuration without responseFormat which is causing the error
+    // Конфигурация без responseFormat, вызывающего ошибку
     const geminiConfig = {
         temperature: 0.2,
         topP: 1,
@@ -21,7 +21,7 @@ const setupGemini = () => {
     });
 };
 
-// Generate flashcards for a topic using Gemini
+// Генерация карточек для темы с помощью Gemini
 router.post('/', auth, async (req, res) => {
     try {
         const { topic, count = 10 } = req.body;
@@ -30,7 +30,7 @@ router.post('/', auth, async (req, res) => {
             return res.status(400).json({ message: 'Тема обязательна' });
         }
         
-        // Setup the prompt for Gemini in Russian
+        // Настройка промпта для Gemini на русском
         const prompt = `Сгенерируй ${count} карточек для изучения темы "${topic}".
         Каждая карточка должна содержать вопрос ('question') и ответ ('answer').
         Верни карточки ТОЛЬКО как валидный JSON массив объектов.
@@ -46,9 +46,9 @@ router.post('/', auth, async (req, res) => {
         const response = await result.response;
         
         try {
-            // Since responseFormat is no longer used, we need to ensure text is valid JSON
+            // Поскольку responseFormat больше не используется, нужно убедиться, что текст является валидным JSON
             const text = response.text();
-            // Try to extract JSON if the response contains other text
+            // Попытаться извлечь JSON, если ответ содержит другой текст
             const jsonMatch = text.match(/\[[\s\S]*\]/);
             const jsonText = jsonMatch ? jsonMatch[0] : text;
             
@@ -61,7 +61,7 @@ router.post('/', auth, async (req, res) => {
                 });
             }
             
-            // Return the generated cards without saving to database yet
+            // Вернуть сгенерированные карточки без сохранения в БД
             res.json({
                 topic,
                 cards: cards.map(card => ({
@@ -87,7 +87,7 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// *** NEW: Explain Answer using Gemini ***
+// *** НОВОЕ: Объяснение ответа с помощью Gemini ***
 router.post('/explain', auth, async (req, res) => {
     try {
         const { question, answer } = req.body;
@@ -96,7 +96,7 @@ router.post('/explain', auth, async (req, res) => {
             return res.status(400).json({ message: 'Требуются и вопрос, и ответ' });
         }
 
-        // Setup the prompt for Gemini in Russian
+        // Настройка промпта для Gemini на русском
         const prompt = `Кратко объясни, почему ответ "${answer}" является правильным для вопроса "${question}". 
         Объяснение должно быть понятным и по существу, не более 2-3 предложений. 
         Избегай прямого повторения вопроса или ответа в начале объяснения. Просто дай объяснение.`;
@@ -109,15 +109,15 @@ router.post('/explain', auth, async (req, res) => {
         res.json({ explanation: explanationText });
 
     } catch (error) {
-        console.error('Ошибка генерации объяснения:', error); // Translate log
+        console.error('Ошибка генерации объяснения:', error); // Перевести лог
         res.status(500).json({ 
-            message: 'Ошибка генерации объяснения', // Translate error message
+            message: 'Ошибка генерации объяснения', // Перевести сообщение об ошибке
             error: error.message
         });
     }
 });
 
-// Save generated cards to a topic
+// Сохранение сгенерированных карточек в тему
 router.post('/save', auth, async (req, res) => {
     try {
         const { topicName, topicDescription, cards } = req.body;
@@ -128,28 +128,28 @@ router.post('/save', auth, async (req, res) => {
             });
         }
         
-        // Create or find the topic FOR THIS USER
+        // Создать или найти тему ДЛЯ ЭТОГО ПОЛЬЗОВАТЕЛЯ
         let topic = await Topic.findOne({ name: topicName, userId: req.userId });
         
         if (!topic) {
             topic = new Topic({
                 name: topicName,
                 description: topicDescription || `Сгенерированные карточки по теме ${topicName}`,
-                userId: req.userId // Associate topic with user
+                userId: req.userId // Связать тему с пользователем
             });
             await topic.save();
         }
         
-        // Prepare cards for insertion, adding userId
+        // Подготовить карточки для вставки, добавив userId
         const cardsToInsert = cards.map(card => ({
             topicId: topic._id,
             question: card.question,
             answer: card.answer,
             source: 'LLM',
-            userId: req.userId // Associate card with user
+            userId: req.userId // Связать карточку с пользователем
         }));
         
-        // Insert cards
+        // Вставить карточки
         const savedCards = await Card.insertMany(cardsToInsert);
         
         res.status(201).json({

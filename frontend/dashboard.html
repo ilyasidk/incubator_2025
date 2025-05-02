@@ -32,12 +32,12 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex flex-col lg:flex-row">
-            <!-- Topics Panel -->
+            <!-- Панель тем -->
             <div class="w-full lg:w-1/4 p-4">
                 <div class="bg-white shadow-md rounded-lg p-4">
                     <h2 class="text-lg font-semibold mb-4">Topics</h2>
                     <ul id="topics-list" class="space-y-2">
-                        <!-- Topics will be loaded here -->
+                        <!-- Темы будут загружены сюда -->
                         <li class="p-2 bg-gray-100 rounded text-center">Loading topics...</li>
                     </ul>
                     <button id="add-topic-btn" class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium">
@@ -46,14 +46,14 @@
                 </div>
             </div>
 
-            <!-- Main Content -->
+            <!-- Основной контент -->
             <div class="w-full lg:w-3/4 p-4">
-                <!-- Flashcard Display -->
+                <!-- Отображение карточек -->
                 <div id="flashcard-container" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
                     <div class="flex justify-between items-center mb-4">
                         <h2 id="current-topic" class="text-xl font-semibold">Topic Name</h2>
                         <div class="flex items-center space-x-4">
-                             <!-- Card Actions -->
+                             <!-- Действия с карточками -->
                             <div id="card-actions" class="flex items-center space-x-2 border-r border-gray-300 pr-4 mr-2 hidden">
                                 <button id="add-card-btn" title="Add New Card" class="p-1 text-gray-500 hover:text-green-600">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -71,7 +71,7 @@
                                     </svg>
                                 </button>
                             </div>
-                             <!-- Study Mode Toggle -->
+                             <!-- Переключатель режима изучения -->
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="study-mode-toggle" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
@@ -82,7 +82,7 @@
                         </div>
                     </div>
 
-                    <!-- Flip Card Mode (Original) -->
+                    <!-- Режим переворота карточки (Оригинальный) -->
                     <div id="flip-card-container" class="w-full h-64 perspective-1000">
                         <div class="card w-full h-full">
                             <div class="card-front">
@@ -101,8 +101,8 @@
                                         </svg>
                                      </button>
                                  </div>
-                                <p id="card-answer" class="text-center text-lg flex-grow flex items-center justify-center">Loading answer...</p> 
-                                <!-- AI Explanation Area -->
+                                <p id="card-answer" class="text-center text-lg flex-grow flex items-center justify-center">Loading answer...</p>
+                                <!-- Область объяснения ИИ -->
                                 <div id="ai-explanation-container" class="mt-3 pt-3 border-t border-gray-200 text-sm text-left hidden">
                                     <p id="ai-explanation-text" class="text-gray-700"></p>
                                 </div>
@@ -110,15 +110,15 @@
                         </div>
                     </div>
 
-                    <!-- Study Mode (New) -->
+                    <!-- Режим изучения (Новый) -->
                     <div id="study-card-container" class="w-full h-64 hidden">
                         <div class="study-card-inner flex h-full rounded-lg overflow-hidden shadow-lg cursor-pointer">
-                            <!-- Question side (Left) -->
+                            <!-- Сторона вопроса (Левая) -->
                             <div class="study-card-side study-card-question w-1/2 bg-indigo-500 p-4 flex flex-col justify-center text-white">
                                 <h3 class="text-lg font-medium text-center mb-4">Question</h3>
                                 <p id="study-card-question" class="text-center text-lg">Loading question...</p>
                             </div>
-                            <!-- Answer side (Right) -->
+                            <!-- Сторона ответа (Правая) -->
                             <div class="study-card-side study-card-answer w-1/2 bg-blue-500 p-4 flex flex-col justify-center text-white">
                                 <h3 class="text-lg font-medium text-center mb-4">Answer</h3>
                                 <p id="study-card-answer" class="text-center text-lg">Loading answer...</p>
@@ -126,7 +126,7 @@
                         </div>
                     </div>
                     
-                    <!-- Message for no cards -->
+                    <!-- Сообщение об отсутствии карточек -->
                     <div id="no-cards-message" class="text-center text-gray-500 py-10 hidden">
                         <p>No cards available for this topic.</p>
                         <button id="add-first-card-btn" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium">
@@ -149,7 +149,7 @@
                     </div>
                 </div>
 
-                <!-- Progress Display -->
+                <!-- Отображение прогресса -->
                 <div id="progress-container" class="bg-white shadow-md rounded-lg p-6 mb-6 hidden">
                     <h2 class="text-xl font-semibold mb-4">Your Progress</h2>
                     <div class="relative pt-1">
@@ -171,7 +171,7 @@
                     </div>
                 </div>
 
-                <!-- Welcome Message (Default View) -->
+                <!-- Приветственное сообщение (По умолчанию) -->
                 <div id="welcome-container" class="bg-white shadow-md rounded-lg p-6">
                     <h2 class="text-xl font-semibold mb-4">Welcome to Flashcards Master!</h2>
                     <p class="mb-4">Select a topic from the sidebar to start learning with flashcards.</p>
@@ -189,7 +189,7 @@
         </div>
     </div>
 
-    <!-- Add Topic Modal -->
+    <!-- Модальное окно добавления темы -->
     <div id="add-topic-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 class="text-xl font-semibold mb-4">Add New Topic</h2>
@@ -215,7 +215,7 @@
         </div>
     </div>
 
-    <!-- Generate Cards Modal -->
+    <!-- Модальное окно генерации карточек -->
     <div id="generate-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 class="text-xl font-semibold mb-4">Generate Flashcards with AI</h2>
@@ -252,7 +252,7 @@
         </div>
     </div>
 
-    <!-- Add Card Modal -->
+    <!-- Модальное окно добавления карточки -->
     <div id="add-card-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 class="text-xl font-semibold mb-4">Add New Card</h2>
@@ -278,7 +278,7 @@
         </div>
     </div>
 
-    <!-- Edit Card Modal -->
+    <!-- Модальное окно редактирования карточки -->
     <div id="edit-card-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white rounded-lg p-6 max-w-md w-full">
             <h2 class="text-xl font-semibold mb-4">Edit Card</h2>

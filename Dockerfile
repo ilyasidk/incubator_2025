@@ -1,54 +1,54 @@
-# Dockerfile for Incubator 2025 Project
-# Stage 1: Build Frontend
+# Dockerfile для проекта Incubator 2025
+# Этап 1: Сборка Frontend
 FROM node:18-alpine AS frontend-builder
 WORKDIR /usr/src/frontend
 
-# Copy frontend package files and install dependencies
+# Копирование файлов package* frontend и установка зависимостей
 COPY frontend/package*.json ./
 RUN npm ci
 
-# Copy the rest of the frontend source code
+# Копирование остального исходного кода frontend
 COPY frontend/ .
 
-# Build the frontend (generate CSS, copy assets to dist)
+# Сборка frontend (генерация CSS, копирование ассетов в dist)
 RUN npm run build
 
-# Stage 2: Build Backend
+# Этап 2: Сборка Backend
 FROM node:18-alpine AS backend-builder
 
 WORKDIR /usr/src/backend
 
-# Copy backend package files and install only production dependencies
+# Копирование файлов package* backend и установка только production зависимостей
 COPY ./backend/package*.json ./
 RUN npm ci --only=production
 
-# Copy the rest of the backend source code
+# Копирование остального исходного кода backend
 COPY ./backend/ .
 
-# Final Stage: Combine Frontend and Backend
+# Финальный этап: Объединение Frontend и Backend
 FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-# Copy package files from backend-builder first
+# Сначала копирование файлов package* из backend-builder
 COPY --from=backend-builder /usr/src/backend/package*.json ./
 
-# Install production dependencies directly in the final image
+# Установка production зависимостей прямо в финальном образе
 RUN npm ci --only=production
 
-# Copy the rest of the backend code (excluding node_modules)
-# Note: We copy '.' from the builder, which contains everything.
-# We rely on the previous npm ci having created node_modules here,
-# and potentially overwriting node_modules from the copy if it existed.
-# A potentially safer way might be to explicitly list what to copy, 
-# but this is common practice.
+# Копирование остального кода backend (исключая node_modules)
+# Примечание: Мы копируем '.' из builder, который содержит все.
+# Мы полагаемся на то, что предыдущая команда npm ci создала здесь node_modules,
+# и потенциально перезаписала node_modules из копии, если они существовали.
+# Возможно, более безопасный способ - явно перечислить, что копировать,
+# но это распространенная практика.
 COPY --from=backend-builder /usr/src/backend . 
 
-# Copy built frontend assets from frontend-builder into a public directory
+# Копирование собранных ассетов frontend из frontend-builder в директорию public
 COPY --from=frontend-builder /usr/src/frontend/dist ./public
 
-# Expose the port the app runs on (Cloud Run will set this via PORT env var)
+# Открытие порта, на котором работает приложение (Cloud Run установит его через переменную окружения PORT)
 EXPOSE 8080
 
-# Run the backend server (which will also serve frontend)
+# Запуск backend сервера (который также будет отдавать frontend)
 CMD ["node", "server.js"] 

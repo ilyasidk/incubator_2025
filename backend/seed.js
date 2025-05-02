@@ -6,70 +6,70 @@ const Topic = require('./models/Topic');
 const Card = require('./models/Card');
 const Progress = require('./models/Progress');
 
-// Sample data
+// Пример данных
 const sampleTopicsData = [
     {
-        name: 'JavaScript Basics',
-        description: 'Fundamental concepts of JavaScript programming language'
+        name: 'Основы JavaScript',
+        description: 'Фундаментальные концепции языка программирования JavaScript'
     },
     {
-        name: 'World Capitals',
-        description: 'Capital cities of countries around the world'
+        name: 'Столицы мира',
+        description: 'Столицы стран мира'
     }
 ];
 
 const sampleCardsData = {
-    'JavaScript Basics': [
+    'Основы JavaScript': [
         {
-            question: 'What is a closure in JavaScript?',
-            answer: 'A closure is a function that has access to its own scope, the scope of the outer function, and the global scope.',
+            question: 'Что такое замыкание в JavaScript?',
+            answer: 'Замыкание - это функция, имеющая доступ к своей области видимости, области видимости внешней функции и глобальной области видимости.',
             source: 'API'
         },
         {
-            question: 'What is the difference between let and var?',
-            answer: 'var is function-scoped while let is block-scoped. Variables declared with var are hoisted to the top of their scope.',
+            question: 'В чем разница между let и var?',
+            answer: 'var имеет функциональную область видимости, а let - блочную. Переменные, объявленные с помощью var, "поднимаются" (hoisted) в начало своей области видимости.',
             source: 'API'
         },
         {
-            question: 'What is the purpose of the "use strict" directive?',
-            answer: 'It enables strict mode, which catches common coding mistakes and prevents unsafe actions. It makes debugging easier.',
+            question: 'Какова цель директивы "use strict"?',
+            answer: 'Она включает строгий режим, который отлавливает распространенные ошибки кодирования и предотвращает небезопасные действия. Это облегчает отладку.',
             source: 'API'
         },
         {
-            question: 'What is a Promise in JavaScript?',
-            answer: 'A Promise is an object representing the eventual completion or failure of an asynchronous operation.',
+            question: 'Что такое Promise в JavaScript?',
+            answer: 'Promise - это объект, представляющий конечное завершение или неудачу асинхронной операции.',
             source: 'API'
         },
         {
-            question: 'What is the difference between == and === operators?',
-            answer: '== compares values with type coercion, while === compares both values and types without coercion.',
+            question: 'В чем разница между операторами == и ===?',
+            answer: '== сравнивает значения с приведением типов, тогда как === сравнивает и значения, и типы без приведения.',
             source: 'API'
         }
     ],
-    'World Capitals': [
+    'Столицы мира': [
         {
-            question: 'What is the capital of France?',
-            answer: 'Paris',
+            question: 'Какая столица Франции?',
+            answer: 'Париж',
             source: 'API'
         },
         {
-            question: 'What is the capital of Japan?',
-            answer: 'Tokyo',
+            question: 'Какая столица Японии?',
+            answer: 'Токио',
             source: 'API'
         },
         {
-            question: 'What is the capital of Brazil?',
-            answer: 'Brasília',
+            question: 'Какая столица Бразилии?',
+            answer: 'Бразилиа',
             source: 'API'
         },
         {
-            question: 'What is the capital of Australia?',
-            answer: 'Canberra',
+            question: 'Какая столица Австралии?',
+            answer: 'Канберра',
             source: 'API'
         },
         {
-            question: 'What is the capital of Egypt?',
-            answer: 'Cairo',
+            question: 'Какая столица Египта?',
+            answer: 'Каир',
             source: 'API'
         }
     ]
@@ -77,7 +77,7 @@ const sampleCardsData = {
 
 async function seedDatabase() {
     try {
-        // Connect to MongoDB
+        // Подключение к MongoDB
         await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
@@ -85,7 +85,7 @@ async function seedDatabase() {
         
         console.log('Connected to MongoDB');
         
-        // Clear existing data
+        // Очистка существующих данных
         console.log('Clearing existing data...');
         await User.deleteMany({});
         await Topic.deleteMany({});
@@ -93,7 +93,7 @@ async function seedDatabase() {
         await Progress.deleteMany({});
         console.log('Cleared existing data');
         
-        // Create test user
+        // Создание тестового пользователя
         console.log('Creating test user...');
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash('password123', salt);
@@ -106,7 +106,7 @@ async function seedDatabase() {
         const userId = user._id;
         console.log(`Created test user: ${user.email} (password: password123) with ID: ${userId}`);
         
-        // Create topics and cards FOR THE TEST USER
+        // Создание тем и карточек ДЛЯ ТЕСТОВОГО ПОЛЬЗОВАТЕЛЯ
         console.log('Creating topics and cards for test user...');
         for (const topicData of sampleTopicsData) {
             const topic = new Topic({
@@ -135,11 +135,11 @@ async function seedDatabase() {
     } catch (error) {
         console.error('Error seeding database:', error);
     } finally {
-        // Close the connection
+        // Закрытие соединения
         await mongoose.connection.close();
         console.log('Database connection closed');
     }
 }
 
-// Run the seed function
+// Запуск функции заполнения
 seedDatabase(); 

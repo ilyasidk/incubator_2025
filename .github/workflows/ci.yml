@@ -1,4 +1,4 @@
-# Basic CI workflow (can be expanded later)
+# Базовый CI workflow (может быть расширен позже)
 name: Node.js CI
 
 on:
@@ -27,8 +27,8 @@ jobs:
     - name: Install Backend Dependencies
       run: cd backend && npm ci
 
-    # Add steps for linting or testing here later
-    # - name: Run Linter
+    # Добавьте шаги для линтинга или тестирования здесь позже
+    # - name: Запустить Линтер
     #   run: cd backend && npm run lint
-    # - name: Run Tests
+    # - name: Запустить Тесты
     #   run: cd backend && npm test 

@@ -1,10 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-// Ensure the dist directory exists
+// Убедиться, что каталог dist существует
 fs.ensureDirSync(path.join(__dirname, '../dist'));
 
-// HTML files
+// HTML-файлы
 fs.copySync(
   path.join(__dirname, '../index.html'),
   path.join(__dirname, '../dist/index.html')
@@ -14,7 +14,7 @@ fs.copySync(
   path.join(__dirname, '../dist/dashboard.html')
 );
 
-// JavaScript files
+// JavaScript-файлы
 fs.copySync(
   path.join(__dirname, '../script.js'),
   path.join(__dirname, '../dist/script.js')
@@ -24,10 +24,9 @@ fs.copySync(
   path.join(__dirname, '../dist/dashboard.js')
 );
 
-// CSS file
+// CSS-файл
 fs.copySync(
   path.join(__dirname, '../style.css'),
   path.join(__dirname, '../dist/style.css')
 );
 
-console.log('Build complete! Files copied to dist/'); 
