@@ -5,6 +5,23 @@ const Topic = require('../models/Topic');
 const Card = require('../models/Card');
 const auth = require('../middleware/auth');
 
+// Функция retry с экспоненциальной задержкой для обхода rate limits
+const retryWithDelay = async (fn, maxRetries = 3, baseDelay = 1000) => {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await fn();
+        } catch (error) {
+            if (error.status === 429 && i < maxRetries - 1) {
+                const delay = baseDelay * Math.pow(2, i);
+                console.log(`Rate limit hit, waiting ${delay}ms before retry ${i + 1}/${maxRetries}`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                continue;
+            }
+            throw error;
+        }
+    }
+};
+
 // Настройка Gemini
 const setupGemini = () => {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -27,7 +44,7 @@ const setupGemini = () => {
             maxOutputTokens: 4096
         };
         return genAI.getGenerativeModel({ 
-            model: "gemini-1.5-pro",
+            model: "gemini-1.5-flash",
             generationConfig: geminiConfig
         });
     } catch (error) {
@@ -55,12 +72,7 @@ router.post('/', auth, async (req, res) => {
         НЕ включай никаких объяснений, markdown форматирования или другого текста вне JSON массива.
         ВЕРНИ ТОЛЬКО JSON МАССИВ.`;
         
-        const model = setupGemini();
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        
-        try {
-            // Поскольку responseFormat больше не используется, нужно убедиться, что текст является валидным JSON
+                const model = setupGemini();        const result = await retryWithDelay(() => model.generateContent(prompt));        const response = await result.response;                try {            // Поскольку responseFormat больше не используется, нужно убедиться, что текст является валидным JSON
             const text = response.text();
             // Попытаться извлечь JSON, если ответ содержит другой текст
             const jsonMatch = text.match(/\[[\s\S]*\]/);
@@ -115,10 +127,7 @@ router.post('/explain', auth, async (req, res) => {
         Объяснение должно быть понятным и по существу, не более 2-3 предложений. 
         Избегай прямого повторения вопроса или ответа в начале объяснения. Просто дай объяснение.`;
         
-        const model = setupGemini();
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const explanationText = response.text();
+                const model = setupGemini();        const result = await retryWithDelay(() => model.generateContent(prompt));        const response = await result.response;        const explanationText = response.text();
 
         res.json({ explanation: explanationText });
 
