@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Card = require('../models/Card');
 const Topic = require('../models/Topic');
+const Progress = require('../models/Progress');
 const auth = require('../middleware/auth');
 
 async function checkTopicOwnerForCards(req, res, next) {
@@ -123,12 +124,62 @@ router.put('/:id', auth, checkCardOwner, async (req, res) => {
 
 router.delete('/:id', auth, checkCardOwner, async (req, res) => {
     try {
-        
         await Card.deleteOne({ _id: req.params.id, userId: req.userId });
         res.json({ message: 'Card deleted successfully' });
     } catch (error) {
         console.error('Error deleting card:', error);
         res.status(500).json({ message: 'Error deleting card' });
+    }
+});
+
+// Отметить карточку как изученную/неизученную
+router.post('/:id/mark', auth, checkCardOwner, async (req, res) => {
+    try {
+        const { status } = req.body;
+        const cardId = req.params.id;
+        const topicId = req.card.topicId;
+
+        if (!status || !['known', 'unknown'].includes(status)) {
+            return res.status(400).json({ message: 'Status must be "known" or "unknown"' });
+        }
+
+        // Найти или создать прогресс для темы
+        let progressDoc = await Progress.findOne({ 
+            userId: req.userId, 
+            topicId 
+        });
+        
+        if (!progressDoc) {
+            // Создать новый документ прогресса
+            progressDoc = new Progress({
+                userId: req.userId,
+                topicId,
+                knownCardIds: [],
+                unknownCardIds: [],
+            });
+        }
+        
+        // Обновить массивы в зависимости от статуса
+        if (status === 'known') {
+            progressDoc.knownCardIds.addToSet(cardId);
+            progressDoc.unknownCardIds.pull(cardId);
+        } else {
+            progressDoc.unknownCardIds.addToSet(cardId);
+            progressDoc.knownCardIds.pull(cardId);
+        }
+        
+        // Обновить счетчики
+        progressDoc.knownCount = progressDoc.knownCardIds.length;
+        progressDoc.unknownCount = progressDoc.unknownCardIds.length;
+        progressDoc.lastActive = new Date();
+        
+        const savedProgress = await progressDoc.save();
+        
+        res.json(savedProgress);
+        
+    } catch (error) {
+        console.error('Error marking card:', error);
+        res.status(500).json({ message: 'Error marking card' });
     }
 });
 

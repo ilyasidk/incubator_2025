@@ -41,6 +41,67 @@ router.get('/:id', auth, checkTopicOwner, async (req, res) => {
     res.json(req.topic);
 });
 
+// Получить карточки темы (проверить владение)
+router.get('/:id/cards', auth, checkTopicOwner, async (req, res) => {
+    try {
+        const cards = await Card.find({ 
+            topicId: req.params.id, 
+            userId: req.userId 
+        }).sort({ createdAt: -1 });
+        res.json(cards);
+    } catch (error) {
+        console.error('Error fetching cards for topic:', error);
+        res.status(500).json({ message: 'Error fetching cards' });
+    }
+});
+
+// Добавить карточку в тему (проверить владение)
+router.post('/:id/cards', auth, checkTopicOwner, async (req, res) => {
+    try {
+        const { question, answer, source } = req.body;
+        
+        const newCard = new Card({
+            topicId: req.params.id,
+            question,
+            answer,
+            source: source || 'USER',
+            userId: req.userId 
+        });
+        
+        const savedCard = await newCard.save();
+        res.status(201).json(savedCard);
+    } catch (error) {
+        console.error('Error creating card:', error);
+        res.status(500).json({ message: 'Error creating card' });
+    }
+});
+
+// Получить прогресс темы (проверить владение)
+router.get('/:id/progress', auth, checkTopicOwner, async (req, res) => {
+    try {
+        let progress = await Progress.findOne({ 
+            userId: req.userId, 
+            topicId: req.params.id
+        });
+        
+        // Если прогресс не найден, вернуть значения по умолчанию
+        if (!progress) {
+            progress = {
+                userId: req.userId,
+                topicId: req.params.id,
+                knownCount: 0,
+                unknownCount: 0,
+                lastActive: new Date()
+            };
+        }
+        
+        res.json(progress);
+    } catch (error) {
+        console.error('Error fetching topic progress:', error);
+        res.status(500).json({ message: 'Error fetching progress' });
+    }
+});
+
 // Создать новую тему для вошедшего пользователя
 router.post('/', auth, async (req, res) => {
     try {
