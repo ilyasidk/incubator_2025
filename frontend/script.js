@@ -2,7 +2,7 @@
 console.log("Flashcards Master frontend script loaded.");
 
 // Конфигурация
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://incubator-2025.onrender.com/api';
 
 // Элементы DOM
 const loginForm = document.getElementById('login-form');

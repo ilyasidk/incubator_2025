@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = 'http://localhost:8080/api'; // Определить базовый URL для бэкенд API
+const API_URL = 'https://incubator-2025.onrender.com/api'; // Определить базовый URL для бэкенд API
 
 // Переменные состояния
 let currentTopicId = null;
