@@ -26,9 +26,3 @@ jobs:
 
     - name: Install Backend Dependencies
       run: cd backend && npm ci
-
-    # Добавьте шаги для линтинга или тестирования здесь позже
-    # - name: Запустить Линтер
-    #   run: cd backend && npm run lint
-    # - name: Запустить Тесты
-    #   run: cd backend && npm test 

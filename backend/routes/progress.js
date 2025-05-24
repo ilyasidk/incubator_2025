@@ -67,12 +67,7 @@ router.post('/topic/:topicId', auth, async (req, res) => {
             return res.status(400).json({ message: 'Требуется cardId и status (known/unknown)' });
         }
         
-        // Закомментированная проверка существования темы
-        // const topic = await Topic.findById(topicId); // Получить тему
-        // if (!topic) { // Если тема не найдена
-        //     return res.status(404).json({ message: 'Тема не найдена' });
-        // }
-        
+
         let progressDoc = await Progress.findOne({ 
             userId: req.userId, 
             topicId 

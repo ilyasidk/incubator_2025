@@ -7,18 +7,32 @@ const auth = require('../middleware/auth');
 
 // Настройка Gemini
 const setupGemini = () => {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    // Конфигурация без responseFormat, вызывающего ошибку
-    const geminiConfig = {
-        temperature: 0.2,
-        topP: 1,
-        topK: 32,
-        maxOutputTokens: 4096
-    };
-    return genAI.getGenerativeModel({ 
-        model: "gemini-1.5-pro",
-        generationConfig: geminiConfig
-    });
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+        throw new Error('GEMINI_API_KEY не настроен в переменных окружения. Пожалуйста, получите API ключ на https://aistudio.google.com/app/apikey и добавьте его в файл .env');
+    }
+    
+    if (apiKey === 'your_gemini_api_key_here') {
+        throw new Error('GEMINI_API_KEY содержит значение по умолчанию. Пожалуйста, замените его на ваш настоящий API ключ от Google AI Studio');
+    }
+    
+    try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        // Конфигурация без responseFormat, вызывающего ошибку
+        const geminiConfig = {
+            temperature: 0.2,
+            topP: 1,
+            topK: 32,
+            maxOutputTokens: 4096
+        };
+        return genAI.getGenerativeModel({ 
+            model: "gemini-1.5-pro",
+            generationConfig: geminiConfig
+        });
+    } catch (error) {
+        throw new Error(`Ошибка инициализации Gemini AI: ${error.message}. Проверьте корректность GEMINI_API_KEY`);
+    }
 };
 
 // Генерация карточек для темы с помощью Gemini

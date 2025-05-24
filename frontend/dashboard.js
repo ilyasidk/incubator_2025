@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = '/api'; // Определить базовый URL для бэкенд API
+const API_URL = 'http://localhost:8080/api'; // Определить базовый URL для бэкенд API
 
 // Переменные состояния
 let currentTopicId = null;
@@ -342,7 +342,6 @@ function updateUIState(state, message = '') {
             break;
         case 'loading':
             flashcardContainer.classList.remove('hidden'); // Показать контейнер карточек
-            // Возможно, показать индикатор загрузки внутри flashcardContainer
             currentTopicElement.textContent = 'Загрузка темы...'; // Сообщение о загрузке
             break;
         case 'cards_loaded':
