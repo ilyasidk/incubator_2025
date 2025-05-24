@@ -58,7 +58,7 @@
   }
 
   .flash-red {
-    animation: flash-red-bg 0.3s ease-out; /
+    animation: flash-red-bg 0.3s ease-out;
   }
   .flash-green {
     animation: flash-green-bg 0.3s ease-out; 
