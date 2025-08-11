@@ -416,12 +416,7 @@ function toggleStudyMode(isStudyMode, forceUpdate = false) {
             cardActions.classList.remove('hidden'); // Показать действия, если есть карточки
         }
     }
-    // Убедиться, что правильные элементы видны при переключении
-    if (currentCards.length === 0 && !isStudyMode) {
-         updateUIState('no_cards'); // Вернуться к состоянию "нет карточек", если мы не в режиме изучения
-    } else if (currentCards.length > 0) {
-         updateUIState('cards_loaded'); // Обновить UI для отображения карточек/контейнеров
-    }
+    // Убрать рекурсивные вызовы updateUIState - управление состоянием происходит в updateUIState
 }
 
 // Открыть модальное окно добавления карточки

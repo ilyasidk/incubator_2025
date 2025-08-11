@@ -283,7 +283,7 @@ async function loadCardsForTopic(topicId, topicName = 'Выбранная тем
 
     try {
         updateUIState('loading');
-        currentCards = await apiRequest(`/topics/${topicId}/cards`); // Загрузить карточки
+        currentCards = await apiRequest(`/cards/topic/${topicId}`); // Загрузить карточки
         await loadProgressForTopic(topicId); // Загрузить прогресс ПОСЛЕ карточек
 
         if (currentCards.length > 0) {
@@ -415,12 +415,7 @@ function toggleStudyMode(isStudyMode, forceUpdate = false) {
             cardActions.classList.remove('hidden'); // Показать действия, если есть карточки
         }
     }
-    // Убедиться, что правильные элементы видны при переключении
-    if (currentCards.length === 0 && !isStudyMode) {
-         updateUIState('no_cards'); // Вернуться к состоянию "нет карточек", если мы не в режиме изучения
-    } else if (currentCards.length > 0) {
-         updateUIState('cards_loaded'); // Обновить UI для отображения карточек/контейнеров
-    }
+    // Убрать рекурсивные вызовы updateUIState - управление состоянием происходит в updateUIState
 }
 
 // Открыть модальное окно добавления карточки
@@ -470,7 +465,11 @@ async function handleAddCardSubmit(event) {
     toggleButtonLoading(confirmAddCardBtn, true);
 
     try {
-        const newCard = await apiRequest(`/topics/${currentTopicId}/cards`, 'POST', { question, answer });
+        const newCard = await apiRequest('/cards', 'POST', { 
+            topicId: currentTopicId,
+            question, 
+            answer 
+        });
         closeAddCardModal();
         // Добавить новую карточку локально и обновить UI
         currentCards.push(newCard); // Добавить в конец
@@ -566,7 +565,7 @@ async function handleDeleteCard() {
 async function loadProgressForTopic(topicId) {
     if (!topicId) return;
     try {
-        const progressData = await apiRequest(`/topics/${topicId}/progress`) || { knownCount: 0, unknownCount: 0 }; // По умолчанию 0, если нет прогресса
+        const progressData = await apiRequest(`/progress/topic/${topicId}`) || { knownCount: 0, unknownCount: 0 }; // По умолчанию 0, если нет прогресса
         progress = {
             knownCount: progressData.knownCount || 0,
             unknownCount: progressData.unknownCount || 0,
