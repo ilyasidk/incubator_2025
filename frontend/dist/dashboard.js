@@ -50,6 +50,7 @@ const studyModeToggle = document.getElementById('study-mode-toggle');
 // Элементы DOM - Действия с карточками (Добавить/Редактировать/Удалить)
 const cardActions = document.getElementById('card-actions');
 const addCardBtn = document.getElementById('add-card-btn');
+const batchAddCardBtn = document.getElementById('batch-add-card-btn');
 const editCardBtn = document.getElementById('edit-card-btn');
 const deleteCardBtn = document.getElementById('delete-card-btn');
 const addFirstCardBtn = document.getElementById('add-first-card-btn'); 
@@ -83,6 +84,19 @@ const editCardAnswerInput = document.getElementById('edit-card-answer');
 const editCardError = document.getElementById('edit-card-error');
 const cancelEditCardBtn = document.getElementById('cancel-edit-card');
 const confirmEditCardBtn = document.getElementById('confirm-edit-card');
+
+// Элементы DOM - Модальное окно массового добавления карточек
+const batchAddCardsModal = document.getElementById('batch-add-cards-modal');
+const batchAddCardsForm = document.getElementById('batch-add-cards-form');
+const batchCardsInput = document.getElementById('batch-cards-input');
+const batchSkipDuplicates = document.getElementById('batch-skip-duplicates');
+const batchCardsCount = document.getElementById('batch-cards-count');
+const batchAddCardsError = document.getElementById('batch-add-cards-error');
+const batchAddCardsPreview = document.getElementById('batch-add-cards-preview');
+const batchPreviewList = document.getElementById('batch-preview-list');
+const cancelBatchAddCardsBtn = document.getElementById('cancel-batch-add-cards');
+const previewBatchCardsBtn = document.getElementById('preview-batch-cards');
+const confirmBatchAddCardsBtn = document.getElementById('confirm-batch-add-cards');
 
 // Элементы DOM - Другое
 const logoutBtn = document.getElementById('logout-btn');
@@ -269,7 +283,8 @@ async function loadCardsForTopic(topicId, topicName = 'Выбранная тем
 
     try {
         updateUIState('loading');
-        currentCards = await apiRequest(`/topics/${topicId}/cards`); // Загрузить карточки
+        // ИСПРАВЛЕНО: Правильный маршрут API
+        currentCards = await apiRequest(`/cards/topic/${topicId}`); // Загрузить карточки
         await loadProgressForTopic(topicId); // Загрузить прогресс ПОСЛЕ карточек
 
         if (currentCards.length > 0) {
@@ -456,7 +471,12 @@ async function handleAddCardSubmit(event) {
     toggleButtonLoading(confirmAddCardBtn, true);
 
     try {
-        const newCard = await apiRequest(`/topics/${currentTopicId}/cards`, 'POST', { question, answer });
+        // ИСПРАВЛЕНО: Правильный API эндпоинт
+        const newCard = await apiRequest('/cards', 'POST', { 
+            topicId: currentTopicId,
+            question, 
+            answer 
+        });
         closeAddCardModal();
         // Добавить новую карточку локально и обновить UI
         currentCards.push(newCard); // Добавить в конец
@@ -552,7 +572,8 @@ async function handleDeleteCard() {
 async function loadProgressForTopic(topicId) {
     if (!topicId) return;
     try {
-        const progressData = await apiRequest(`/topics/${topicId}/progress`) || { knownCount: 0, unknownCount: 0 }; // По умолчанию 0, если нет прогресса
+        // ИСПРАВЛЕНО: Правильный API эндпоинт
+        const progressData = await apiRequest(`/progress/topic/${topicId}`) || { knownCount: 0, unknownCount: 0 }; // По умолчанию 0, если нет прогресса
         progress = {
             knownCount: progressData.knownCount || 0,
             unknownCount: progressData.unknownCount || 0,
@@ -617,11 +638,238 @@ async function markCard(status) {
     }
 }
 
+// --- Функции массового добавления карточек ---
 
+function parseBatchCards(inputText) {
+    const lines = inputText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const cards = [];
+    const invalidLines = [];
+    
+    lines.forEach((line, index) => {
+        // Поддерживаем различные разделители: -, --, :, |
+        const separators = [' - ', ' -- ', ': ', ' | '];
+        let parts = null;
+        let separator = null;
+        
+        for (const sep of separators) {
+            if (line.includes(sep)) {
+                parts = line.split(sep);
+                separator = sep;
+                break;
+            }
+        }
+        
+        if (parts && parts.length >= 2) {
+            const question = parts[0].trim();
+            const answer = parts.slice(1).join(separator).trim(); // Объединить остальные части если есть разделитель в ответе
+            
+            if (question && answer) {
+                cards.push({ question, answer });
+            } else {
+                invalidLines.push({ line: index + 1, content: line, reason: 'Пустой вопрос или ответ' });
+            }
+        } else {
+            invalidLines.push({ line: index + 1, content: line, reason: 'Неверный формат (ожидается: вопрос - ответ)' });
+        }
+    });
+    
+    return { cards, invalidLines };
+}
 
+function openBatchAddCardsModal() {
+    if (!currentTopicId) {
+        alert('Сначала выберите тему для добавления карточек');
+        return;
+    }
+    
+    // Сбросить форму
+    batchCardsInput.value = '';
+    batchSkipDuplicates.checked = true;
+    batchAddCardsError.classList.add('hidden');
+    batchAddCardsPreview.classList.add('hidden');
+    updateBatchCardsCount();
+    
+    batchAddCardsModal.classList.remove('hidden');
+}
 
+function closeBatchAddCardsModal() {
+    batchAddCardsModal.classList.add('hidden');
+}
 
+function updateBatchCardsCount() {
+    const text = batchCardsInput.value.trim();
+    if (!text) {
+        batchCardsCount.textContent = 'Карточек: 0';
+        return;
+    }
+    
+    const { cards, invalidLines } = parseBatchCards(text);
+    const validCount = cards.length;
+    const invalidCount = invalidLines.length;
+    
+    if (invalidCount > 0) {
+        batchCardsCount.textContent = `Карточек: ${validCount} (${invalidCount} неверных)`;
+        batchCardsCount.className = 'text-sm text-amber-600';
+    } else {
+        batchCardsCount.textContent = `Карточек: ${validCount}`;
+        batchCardsCount.className = 'text-sm text-gray-500';
+    }
+}
 
+function previewBatchCards() {
+    const text = batchCardsInput.value.trim();
+    if (!text) {
+        showBatchError('Введите карточки для предпросмотра');
+        return;
+    }
+    
+    const { cards, invalidLines } = parseBatchCards(text);
+    
+    if (cards.length === 0) {
+        showBatchError('Не найдено ни одной корректной карточки');
+        return;
+    }
+    
+    // Фильтрация дубликатов если включена опция
+    let filteredCards = cards;
+    let duplicatesRemoved = 0;
+    
+    if (batchSkipDuplicates.checked && currentCards.length > 0) {
+        const existingQuestions = new Set(currentCards.map(card => card.question.toLowerCase().trim()));
+        const uniqueCards = [];
+        
+        cards.forEach(card => {
+            if (!existingQuestions.has(card.question.toLowerCase().trim())) {
+                uniqueCards.push(card);
+            } else {
+                duplicatesRemoved++;
+            }
+        });
+        
+        filteredCards = uniqueCards;
+    }
+    
+    // Отобразить предпросмотр
+    let previewHTML = '';
+    
+    if (filteredCards.length > 0) {
+        previewHTML += '<div class="space-y-2">';
+        filteredCards.slice(0, 10).forEach((card, index) => {
+            previewHTML += `
+                <div class="flex justify-between text-xs p-2 bg-white rounded border">
+                    <span class="font-medium text-blue-600">${card.question}</span>
+                    <span class="text-gray-600">${card.answer}</span>
+                </div>
+            `;
+        });
+        
+        if (filteredCards.length > 10) {
+            previewHTML += `<div class="text-xs text-gray-500 text-center">... и еще ${filteredCards.length - 10} карточек</div>`;
+        }
+        previewHTML += '</div>';
+        
+        if (duplicatesRemoved > 0) {
+            previewHTML += `<div class="mt-2 text-xs text-amber-600">Будет пропущено дубликатов: ${duplicatesRemoved}</div>`;
+        }
+    }
+    
+    if (invalidLines.length > 0) {
+        previewHTML += '<div class="mt-3"><h4 class="text-xs font-medium text-red-600 mb-1">Неверные строки:</h4>';
+        previewHTML += '<div class="space-y-1">';
+        invalidLines.slice(0, 5).forEach(invalid => {
+            previewHTML += `<div class="text-xs text-red-500">Строка ${invalid.line}: ${invalid.content} (${invalid.reason})</div>`;
+        });
+        if (invalidLines.length > 5) {
+            previewHTML += `<div class="text-xs text-red-400">... и еще ${invalidLines.length - 5} неверных строк</div>`;
+        }
+        previewHTML += '</div></div>';
+    }
+    
+    batchPreviewList.innerHTML = previewHTML;
+    batchAddCardsPreview.classList.remove('hidden');
+    hideBatchError();
+}
+
+async function handleBatchAddCardsSubmit(event) {
+    event.preventDefault();
+    
+    const text = batchCardsInput.value.trim();
+    if (!text) {
+        showBatchError('Введите карточки для добавления');
+        return;
+    }
+    
+    if (!currentTopicId) {
+        showBatchError('Не выбрана тема для добавления карточек');
+        return;
+    }
+    
+    const { cards, invalidLines } = parseBatchCards(text);
+    
+    if (cards.length === 0) {
+        showBatchError('Не найдено ни одной корректной карточки');
+        return;
+    }
+    
+    // Фильтрация дубликатов если включена опция
+    let cardsToAdd = cards;
+    if (batchSkipDuplicates.checked && currentCards.length > 0) {
+        const existingQuestions = new Set(currentCards.map(card => card.question.toLowerCase().trim()));
+        cardsToAdd = cards.filter(card => !existingQuestions.has(card.question.toLowerCase().trim()));
+    }
+    
+    if (cardsToAdd.length === 0) {
+        showBatchError('Все карточки уже существуют в этой теме');
+        return;
+    }
+    
+    try {
+        // Отключить кнопку во время загрузки
+        confirmBatchAddCardsBtn.disabled = true;
+        confirmBatchAddCardsBtn.textContent = 'Добавление...';
+        
+        const response = await apiRequest('/cards/batch', 'POST', {
+            topicId: currentTopicId,
+            cards: cardsToAdd,
+            source: 'USER'
+        });
+        
+        if (response) {
+            // Успешно добавлены карточки
+            await loadCardsForTopic(currentTopicId, currentTopicElement.textContent);
+            closeBatchAddCardsModal();
+            
+            const addedCount = cardsToAdd.length;
+            const skippedCount = cards.length - addedCount;
+            let message = `Успешно добавлено ${addedCount} карточек`;
+            if (skippedCount > 0) {
+                message += `, пропущено дубликатов: ${skippedCount}`;
+            }
+            if (invalidLines.length > 0) {
+                message += `, неверных строк: ${invalidLines.length}`;
+            }
+            
+            // Показать уведомление об успехе (можно добавить toast notification)
+            alert(message);
+        }
+    } catch (error) {
+        console.error('Ошибка при массовом добавлении карточек:', error);
+        showBatchError(`Ошибка при добавлении карточек: ${error.message}`);
+    } finally {
+        // Восстановить кнопку
+        confirmBatchAddCardsBtn.disabled = false;
+        confirmBatchAddCardsBtn.textContent = 'Добавить карточки';
+    }
+}
+
+function showBatchError(message) {
+    batchAddCardsError.textContent = message;
+    batchAddCardsError.classList.remove('hidden');
+}
+
+function hideBatchError() {
+    batchAddCardsError.classList.add('hidden');
+}
 
 // --- Инициализация ---
 function initializeDashboard() {
@@ -712,6 +960,23 @@ function initializeDashboard() {
     addFirstCardBtn.addEventListener('click', openAddCardModal); // Кнопка в сообщении "нет карточек"
     cancelAddCardBtn.addEventListener('click', closeAddCardModal);
     addCardForm.addEventListener('submit', handleAddCardSubmit);
+
+    // Обработчики событий - Массовое добавление карточек
+    if (batchAddCardBtn) {
+        batchAddCardBtn.addEventListener('click', openBatchAddCardsModal);
+    }
+    if (cancelBatchAddCardsBtn) {
+        cancelBatchAddCardsBtn.addEventListener('click', closeBatchAddCardsModal);
+    }
+    if (previewBatchCardsBtn) {
+        previewBatchCardsBtn.addEventListener('click', previewBatchCards);
+    }
+    if (batchAddCardsForm) {
+        batchAddCardsForm.addEventListener('submit', handleBatchAddCardsSubmit);
+    }
+    if (batchCardsInput) {
+        batchCardsInput.addEventListener('input', updateBatchCardsCount);
+    }
 
     editCardBtn.addEventListener('click', openEditCardModal);
     cancelEditCardBtn.addEventListener('click', closeEditCardModal);
