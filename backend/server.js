@@ -12,7 +12,7 @@ const authRoutes = require('./routes/auth');
 const topicsRoutes = require('./routes/topics');
 const cardsRoutes = require('./routes/cards');
 const progressRoutes = require('./routes/progress');
-const generateRoutes = require('./routes/generate');
+
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -35,7 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/topics', topicsRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/progress', progressRoutes);
-app.use('/api/generate', generateRoutes);
+
 
 // Промежуточное ПО для обработки ошибок
 app.use((err, req, res, next) => {

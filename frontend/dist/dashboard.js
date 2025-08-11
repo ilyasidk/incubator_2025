@@ -63,19 +63,7 @@ const progressBar = document.getElementById('progress-bar');
 const progressPercentage = document.getElementById('progress-percentage');
 const progressRatio = document.getElementById('progress-ratio');
 
-// Элементы DOM - Модальное окно генерации
-const generateBtn = document.getElementById('generate-btn'); 
-const welcomeGenerateBtn = document.getElementById('welcome-generate'); 
-const generateCardsLinkAlt = document.getElementById('generate-cards-link-alt'); 
-const generateModal = document.getElementById('generate-modal');
-const generateForm = document.getElementById('generate-form'); 
-const generateTopicInput = document.getElementById('generate-topic');
-const generateCountSelect = document.getElementById('generate-count');
-const confirmGenerateBtn = document.getElementById('confirm-generate');
-const cancelGenerateBtn = document.getElementById('cancel-generate');
-const generateError = document.getElementById('generate-error');
-const generationProgress = document.getElementById('generation-progress');
-const generationProgressBar = document.getElementById('generation-progress-bar');
+
 
 // Элементы DOM - Модальное окно добавления карточки
 const addCardModal = document.getElementById('add-card-modal');
@@ -99,9 +87,7 @@ const confirmEditCardBtn = document.getElementById('confirm-edit-card');
 // Элементы DOM - Другое
 const logoutBtn = document.getElementById('logout-btn');
 
-const explainAiBtn = document.getElementById('explain-ai-btn');
-const aiExplanationContainer = document.getElementById('ai-explanation-container');
-const aiExplanationText = document.getElementById('ai-explanation-text');
+
 
 async function apiRequest(endpoint, method = 'GET', body = null) {
     const token = localStorage.getItem('token');
@@ -322,7 +308,7 @@ function displayCard(card, index, total) {
 
     updateUIState('cards_loaded'); // Убедиться, что UI находится в правильном состоянии
     updateCardNavigationButtons(); // Обновить состояние кнопок навигации
-    aiExplanationContainer.classList.add('hidden'); // Скрыть объяснение ИИ при смене карточки
+
 }
 
 // Обновление состояния UI (отображение/скрытие элементов)
@@ -631,131 +617,11 @@ async function markCard(status) {
     }
 }
 
-// --- Модальное окно генератора ---
-// Открыть модальное окно генерации
-function openGenerateModal(topicName = '') {
-    generateTopicInput.value = topicName || ''; // Предзаполнить, если имя предоставлено
-    generateCountSelect.value = '10';
-    clearModalError(generateError);
-    generationProgress.classList.add('hidden');
-    toggleModal(generateModal, true);
-    generateTopicInput.focus();
-}
 
-// Закрыть модальное окно генерации
-function closeGenerateModal() {
-    toggleModal(generateModal, false);
-}
 
-// Обработка отправки формы генерации
-async function handleGenerateSubmit(event) {
-    event.preventDefault();
-    const topic = generateTopicInput.value.trim();
-    const count = generateCountSelect.value;
 
-    clearModalError(generateError);
 
-    if (!topic) {
-        displayModalError(generateError, 'Название темы обязательно.');
-        return;
-    }
 
-    toggleButtonLoading(confirmGenerateBtn, true, 'Генерация...');
-    cancelGenerateBtn.disabled = true; // Отключить отмену во время генерации
-    generationProgress.classList.remove('hidden'); // Показать индикатор прогресса
-    generationProgressBar.style.width = '0%'; // Сбросить полосу прогресса
-    // Симуляция прогресса для лучшего UX (опционально)
-    let progressInterval = setInterval(() => {
-        let currentWidth = parseFloat(generationProgressBar.style.width);
-        if (currentWidth < 90) { // Симулировать прогресс до 90%
-            generationProgressBar.style.width = (currentWidth + 5) + '%';
-        }
-    }, 200);
-
-    try {
-        // Вызвать API генерации (возвращает только карточки)
-        const generatedData = await apiRequest('/generate', 'POST', { topic, count });
-
-        clearInterval(progressInterval); // Остановить симуляцию
-        generationProgressBar.style.width = '100%'; // Отметить как завершенное
-
-        if (!generatedData || !Array.isArray(generatedData.cards) || generatedData.cards.length === 0) {
-             throw new Error("ИИ не смог сгенерировать валидные карточки.");
-        }
-
-        // Сохранить сгенерированные карточки (отправляет POST на /generate/save)
-        // Добавить небольшую задержку перед сохранением, чтобы показать 100% прогресс
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        const saveData = await apiRequest('/generate/save', 'POST', {
-            topicName: topic,
-            // topicDescription: `Сгенерированные карточки о ${topic}`, // Опциональное описание
-            cards: generatedData.cards
-        });
-
-        console.log(saveData.message || `Сгенерировано и сохранено ${generatedData.cards.length} карточек для "${topic}"!`);
-        closeGenerateModal();
-        loadTopics(); // Обновить список тем, чтобы включить новую
-
-        // Опционально: немедленно загрузить новую сгенерированную тему
-        if (saveData.topic && saveData.topic._id) {
-            loadCardsForTopic(saveData.topic._id, saveData.topic.name);
-        }
-
-    } catch (error) {
-        clearInterval(progressInterval); // Остановить симуляцию при ошибке
-        displayModalError(generateError, error.message || 'Не удалось сгенерировать карточки.');
-        generationProgress.classList.add('hidden'); // Скрыть прогресс при ошибке
-    } finally {
-        toggleButtonLoading(confirmGenerateBtn, false);
-        cancelGenerateBtn.disabled = false; // Включить отмену снова
-         // Сбросить полосу прогресса после небольшой задержки, если модальное окно не закрывается автоматически
-        setTimeout(() => {
-            generationProgressBar.style.width = '0%';
-            generationProgress.classList.add('hidden');
-        }, 1000);
-    }
-}
-
-// *** Функция для обработки запроса на объяснение ИИ ***
-async function handleExplainAI() {
-    if (!currentDisplayedCard) {
-        console.error("Не могу объяснить: карточка не выбрана.");
-        return;
-    }
-
-    const question = currentDisplayedCard.question;
-    const answer = currentDisplayedCard.answer;
-
-    // Добавляем класс для подсветки кнопки
-    explainAiBtn.classList.add('active');
-    explainAiBtn.classList.add('text-yellow-600');
-    explainAiBtn.classList.add('bg-yellow-100');
-
-    // Показываем контейнер объяснения
-    aiExplanationContainer.classList.remove('hidden');
-    aiExplanationText.textContent = 'Генерация объяснения...';
-
-    try {
-        const data = await apiRequest('/generate/explain', 'POST', { question, answer });
-        if (data && data.explanation) {
-            aiExplanationText.textContent = data.explanation;
-        } else {
-             aiExplanationText.textContent = 'Не удалось получить объяснение.';
-             console.error("Не удалось получить объяснение от ИИ.");
-        }
-    } catch (error) {
-        aiExplanationText.textContent = `Ошибка: ${error.message}`;
-        console.error(`Не удалось получить объяснение: ${error.message}`);
-    } finally {
-        // Удаляем класс подсветки после завершения запроса
-        setTimeout(() => {
-            explainAiBtn.classList.remove('active');
-            explainAiBtn.classList.remove('text-yellow-600');
-            explainAiBtn.classList.remove('bg-yellow-100');
-        }, 1000); // Оставляем подсветку на 1 секунду после завершения для лучшего UX
-    }
-}
 
 // --- Инициализация ---
 function initializeDashboard() {
@@ -771,12 +637,7 @@ function initializeDashboard() {
     cancelAddTopicBtn.addEventListener('click', closeAddTopicModal);
     addTopicForm.addEventListener('submit', handleAddTopicSubmit); // НОВЫЙ обработчик на форме
 
-    // Обработчики событий - Генерация карточек
-    generateBtn.addEventListener('click', () => openGenerateModal()); // Кнопка навигации
-    welcomeGenerateBtn.addEventListener('click', () => openGenerateModal()); // Кнопка на экране приветствия
-    generateCardsLinkAlt.addEventListener('click', () => openGenerateModal(currentTopicElement.textContent)); // Ссылка в сообщении "нет карточек"
-    cancelGenerateBtn.addEventListener('click', closeGenerateModal);
-    generateForm.addEventListener('submit', handleGenerateSubmit); // НОВЫЙ обработчик на форме
+
 
     // Обработчики событий - Взаимодействие с карточками
     flipCardContainer.addEventListener('click', (event) => {
@@ -796,8 +657,7 @@ function initializeDashboard() {
         // Срабатывать только в режиме переворота И если карточка действительно перевернута
         if (studyModeToggle.checked || !cardElement.classList.contains('is-flipped')) return;
 
-        // Игнорировать клики непосредственно на кнопке объяснения ИИ
-        if (e.target.closest('#explain-ai-btn')) return;
+
 
         const rect = cardBack.getBoundingClientRect();
         const x = e.clientX - rect.left;
@@ -859,15 +719,11 @@ function initializeDashboard() {
 
     deleteCardBtn.addEventListener('click', handleDeleteCard);
 
-    // *** Добавить обработчик событий для кнопки объяснения ИИ ***
-    explainAiBtn.addEventListener('click', (event) => {
-        event.stopPropagation(); // Предотвратить всплытие клика до обработчика отметки cardBack
-        handleExplainAI();
-    });
+
 
     // Начальная загрузка
     loadTopics(); // Загрузить темы при инициализации панели управления
-    updateUIState('welcome'); // Начать с видимого приветственного сообщения
+    updateUIState('initial'); // Начать с видимого приветственного сообщения
 }
 
 // Инициализировать панель управления, когда DOM готов
