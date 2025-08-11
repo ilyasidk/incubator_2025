@@ -7,6 +7,7 @@ let currentCards = [];
 let currentCardIndex = 0;
 let currentDisplayedCard = null; // Хранить текущий видимый объект карточки
 let progress = { knownCount: 0, unknownCount: 0 }; // Добавить переменную состояния прогресса обратно
+let studyAnswerRevealed = false; // Для отслеживания показан ли ответ в study mode
 
 // Элементы DOM - Основные контейнеры
 const welcomeContainer = document.getElementById('welcome-container');
@@ -43,8 +44,11 @@ const cardBack = cardElement.querySelector('.card-back');
 
 // Элементы DOM - Режим изучения
 const studyCardContainer = document.getElementById('study-card-container');
+const studyQuestionCard = document.getElementById('study-question-card');
+const studyAnswerCard = document.getElementById('study-answer-card');
 const studyCardQuestion = document.getElementById('study-card-question');
 const studyCardAnswer = document.getElementById('study-card-answer');
+const studyKnowledgeButtons = document.getElementById('study-knowledge-buttons');
 const studyModeToggle = document.getElementById('study-mode-toggle');
 
 // Элементы DOM - Действия с карточками (Добавить/Редактировать/Удалить)
@@ -314,10 +318,17 @@ function displayCard(card, index, total) {
 
     currentDisplayedCard = card; // Сохранить текущую карточку
 
+    // Обновить flip mode карточки
     cardQuestion.textContent = card.question;
     cardAnswer.textContent = card.answer;
+    
+    // Обновить study mode карточки
     studyCardQuestion.textContent = card.question;
     studyCardAnswer.textContent = card.answer;
+    
+    // Сбросить состояние study mode
+    studyAnswerRevealed = false;
+    resetStudyMode();
 
     cardCounter.textContent = `${index + 1} / ${total}`; // Обновить счетчик
 
@@ -326,7 +337,25 @@ function displayCard(card, index, total) {
 
     updateUIState('cards_loaded'); // Убедиться, что UI находится в правильном состоянии
     updateCardNavigationButtons(); // Обновить состояние кнопок навигации
+}
 
+// Сброс состояния study mode к показу только вопроса
+function resetStudyMode() {
+    if (studyQuestionCard && studyAnswerCard && studyKnowledgeButtons) {
+        studyQuestionCard.classList.remove('hidden');
+        studyAnswerCard.classList.add('hidden');
+        studyKnowledgeButtons.classList.add('hidden');
+    }
+}
+
+// Показать ответ в study mode
+function showStudyAnswer() {
+    if (!studyAnswerRevealed && studyQuestionCard && studyAnswerCard && studyKnowledgeButtons) {
+        studyAnswerRevealed = true;
+        studyQuestionCard.classList.add('hidden');
+        studyAnswerCard.classList.remove('hidden');
+        studyKnowledgeButtons.classList.remove('hidden');
+    }
 }
 
 // Обновление состояния UI (отображение/скрытие элементов)
@@ -644,6 +673,21 @@ async function markCardWithLevel(knowledgeLevel) {
     }
 }
 
+// Функция для оценки и автоматического перехода к следующей карточке
+async function markCardWithLevelAndNext(knowledgeLevel) {
+    if (!currentDisplayedCard || !currentTopicId) return;
+    
+    try {
+        await markCardWithLevel(knowledgeLevel);
+        // Небольшая задержка для показа обратной связи
+        setTimeout(() => {
+            nextCard();
+        }, 300);
+    } catch (error) {
+        console.error('Ошибка при оценке карточки:', error);
+    }
+}
+
 // Старая функция для совместимости
 async function markCard(status) {
     const level = status === 'known' ? 3 : 0;
@@ -685,7 +729,10 @@ function initializeDashboard() {
          }
     });
 
-    // Убрали старые обработчики кликов для оценки - теперь используем кнопки
+    // Обработчик клика на карточку с вопросом в study mode
+    if (studyQuestionCard) {
+        studyQuestionCard.addEventListener('click', showStudyAnswer);
+    }
 
 
     nextBtn.addEventListener('click', nextCard);
@@ -953,6 +1000,7 @@ function hideBatchError() {
 
 // Сделать функции глобальными для доступа из HTML
 window.markCardWithLevel = markCardWithLevel;
+window.markCardWithLevelAndNext = markCardWithLevelAndNext;
 
 // Инициализировать панель управления, когда DOM готов
 document.addEventListener('DOMContentLoaded', initializeDashboard); 

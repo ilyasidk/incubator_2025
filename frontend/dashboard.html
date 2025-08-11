@@ -121,31 +121,31 @@
 
                     <!-- Режим изучения (Новый) -->
                     <div id="study-card-container" class="w-full hidden">
-                        <div class="study-card-inner flex h-64 rounded-lg overflow-hidden shadow-lg mb-4">
-                            <!-- Сторона вопроса (Левая) -->
-                            <div class="study-card-side study-card-question w-1/2 bg-indigo-500 p-4 flex flex-col justify-center text-white">
-                                <h3 class="text-lg font-medium text-center mb-4">Question</h3>
-                                <p id="study-card-question" class="text-center text-lg">Loading question...</p>
-                            </div>
-                            <!-- Сторона ответа (Правая) -->
-                            <div class="study-card-side study-card-answer w-1/2 bg-blue-500 p-4 flex flex-col justify-center text-white">
-                                <h3 class="text-lg font-medium text-center mb-4">Answer</h3>
-                                <p id="study-card-answer" class="text-center text-lg">Loading answer...</p>
-                            </div>
+                        <!-- Карточка с вопросом -->
+                        <div id="study-question-card" class="w-full h-64 rounded-lg shadow-lg mb-4 bg-indigo-500 p-6 flex flex-col justify-center text-white cursor-pointer hover:bg-indigo-600 transition-colors">
+                            <h3 class="text-lg font-medium text-center mb-4">Question</h3>
+                            <p id="study-card-question" class="text-center text-xl">Loading question...</p>
+                            <div class="mt-4 text-center text-sm text-indigo-200">Click to show answer</div>
                         </div>
                         
-                        <!-- Кнопки оценки для режима изучения -->
-                        <div id="study-knowledge-buttons" class="grid grid-cols-2 gap-2">
-                            <button onclick="markCardWithLevel(0)" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded">
+                        <!-- Карточка с ответом (скрыта изначально) -->
+                        <div id="study-answer-card" class="w-full h-64 rounded-lg shadow-lg mb-4 bg-blue-500 p-6 flex flex-col justify-center text-white hidden">
+                            <h3 class="text-lg font-medium text-center mb-4">Answer</h3>
+                            <p id="study-card-answer" class="text-center text-xl">Loading answer...</p>
+                        </div>
+                        
+                        <!-- Кнопки оценки для режима изучения (скрыты изначально) -->
+                        <div id="study-knowledge-buttons" class="grid grid-cols-2 gap-2 hidden">
+                            <button onclick="markCardWithLevelAndNext(0)" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded">
                                 Не знаю
                             </button>
-                            <button onclick="markCardWithLevel(1)" class="bg-orange-500 hover:bg-orange-600 text-white text-sm py-2 px-3 rounded">
+                            <button onclick="markCardWithLevelAndNext(1)" class="bg-orange-500 hover:bg-orange-600 text-white text-sm py-2 px-3 rounded">
                                 Плохо знаю
                             </button>
-                            <button onclick="markCardWithLevel(2)" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 px-3 rounded">
+                            <button onclick="markCardWithLevelAndNext(2)" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 px-3 rounded">
                                 Немного помню
                             </button>
-                            <button onclick="markCardWithLevel(3)" class="bg-green-500 hover:bg-green-600 text-white text-sm py-2 px-3 rounded">
+                            <button onclick="markCardWithLevelAndNext(3)" class="bg-green-500 hover:bg-green-600 text-white text-sm py-2 px-3 rounded">
                                 Хорошо помню
                             </button>
                         </div>
