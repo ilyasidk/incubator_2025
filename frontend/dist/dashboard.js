@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = 'http://localhost:8080/api'; // Локальный сервер для разработки
+const API_URL = 'https://incubator-2025.onrender.com/api'; // Production сервер на Render
 
 // Переменные состояния
 let currentTopicId = null;
