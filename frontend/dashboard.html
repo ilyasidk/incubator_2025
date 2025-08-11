@@ -98,15 +98,30 @@
                                      <h3 class="text-lg font-medium text-center flex-grow">Answer</h3>
 
                                  </div>
-                                <p id="card-answer" class="text-center text-lg flex-grow flex items-center justify-center">Loading answer...</p>
-
+                                <p id="card-answer" class="text-center text-lg flex-grow flex items-center justify-center mb-4">Loading answer...</p>
+                                
+                                <!-- Кнопки оценки знания -->
+                                <div id="knowledge-buttons" class="grid grid-cols-2 gap-2 mt-4">
+                                    <button onclick="markCardWithLevel(0)" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded">
+                                        Не знаю
+                                    </button>
+                                    <button onclick="markCardWithLevel(1)" class="bg-orange-500 hover:bg-orange-600 text-white text-xs py-1 px-2 rounded">
+                                        Плохо знаю
+                                    </button>
+                                    <button onclick="markCardWithLevel(2)" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs py-1 px-2 rounded">
+                                        Немного помню
+                                    </button>
+                                    <button onclick="markCardWithLevel(3)" class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-2 rounded">
+                                        Хорошо помню
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Режим изучения (Новый) -->
-                    <div id="study-card-container" class="w-full h-64 hidden">
-                        <div class="study-card-inner flex h-full rounded-lg overflow-hidden shadow-lg cursor-pointer">
+                    <div id="study-card-container" class="w-full hidden">
+                        <div class="study-card-inner flex h-64 rounded-lg overflow-hidden shadow-lg mb-4">
                             <!-- Сторона вопроса (Левая) -->
                             <div class="study-card-side study-card-question w-1/2 bg-indigo-500 p-4 flex flex-col justify-center text-white">
                                 <h3 class="text-lg font-medium text-center mb-4">Question</h3>
@@ -117,6 +132,22 @@
                                 <h3 class="text-lg font-medium text-center mb-4">Answer</h3>
                                 <p id="study-card-answer" class="text-center text-lg">Loading answer...</p>
                             </div>
+                        </div>
+                        
+                        <!-- Кнопки оценки для режима изучения -->
+                        <div id="study-knowledge-buttons" class="grid grid-cols-2 gap-2">
+                            <button onclick="markCardWithLevel(0)" class="bg-red-500 hover:bg-red-600 text-white text-sm py-2 px-3 rounded">
+                                Не знаю
+                            </button>
+                            <button onclick="markCardWithLevel(1)" class="bg-orange-500 hover:bg-orange-600 text-white text-sm py-2 px-3 rounded">
+                                Плохо знаю
+                            </button>
+                            <button onclick="markCardWithLevel(2)" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-2 px-3 rounded">
+                                Немного помню
+                            </button>
+                            <button onclick="markCardWithLevel(3)" class="bg-green-500 hover:bg-green-600 text-white text-sm py-2 px-3 rounded">
+                                Хорошо помню
+                            </button>
                         </div>
                     </div>
                     

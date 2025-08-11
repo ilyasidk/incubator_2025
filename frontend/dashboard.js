@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = 'https://incubator-2025.onrender.com/api'; // Определить базовый URL для бэкенд API
+const API_URL = 'http://localhost:8080/api'; // Локальный сервер для разработки
 
 // Переменные состояния
 let currentTopicId = null;
@@ -283,7 +283,11 @@ async function loadCardsForTopic(topicId, topicName = 'Выбранная тем
 
     try {
         updateUIState('loading');
+        console.log(`Загружаем карточки для темы ${topicId} по адресу: ${API_URL}/cards/topic/${topicId}`);
+        
         currentCards = await apiRequest(`/cards/topic/${topicId}`); // Загрузить карточки
+        console.log(`Загружено карточек: ${currentCards.length}`, currentCards);
+        
         await loadProgressForTopic(topicId); // Загрузить прогресс ПОСЛЕ карточек
 
         if (currentCards.length > 0) {
@@ -604,30 +608,46 @@ function updateProgressDisplay() {
     progressContainer.classList.toggle('hidden', displayTotal === 0); // Скрыть, если нет карточек
 }
 
-// *** Функция для отметки карточки как изученной/неизученной ***
-async function markCard(status) {
+// *** Функция для отметки карточки с уровнем знания (0-3) ***
+async function markCardWithLevel(knowledgeLevel) {
     if (!currentDisplayedCard || !currentTopicId) return; // Убедиться, что карточка и тема выбраны
     const cardId = currentDisplayedCard._id;
 
     try {
+        console.log(`Отмечаем карточку ${cardId} с уровнем знания: ${knowledgeLevel}`);
+        
         // Отправить обновление на бэкенд
-        const updatedProgress = await apiRequest(`/cards/${cardId}/mark`, 'POST', { status }); // status = 'known' или 'unknown'
+        const updatedProgress = await apiRequest(`/cards/${cardId}/mark`, 'POST', { knowledgeLevel });
 
         // Обновить локальное состояние прогресса из ответа
         if (updatedProgress) {
              progress = {
+                knowledgeLevel: knowledgeLevel,
                 knownCount: updatedProgress.knownCount || 0,
                 unknownCount: updatedProgress.unknownCount || 0
             };
         }
+        
+        // Обновить уровень знания в локальной карточке
+        currentDisplayedCard.knowledgeLevel = knowledgeLevel;
+        
         updateProgressDisplay(); // Обновить полосу прогресса
-        // Переход к следующей карточке? (Опционально, можно добавить как настройку)
-        // nextCard();
+        
+        // Автоматически переходим к следующей карточке после оценки
+        setTimeout(() => {
+            nextCard();
+        }, 500);
+        
     } catch (error) {
-        console.error(`Не удалось отметить карточку как ${status}:`, error);
-        // Сообщить пользователю об ошибке?
+        console.error(`Не удалось отметить карточку с уровнем ${knowledgeLevel}:`, error);
         alert(`Не удалось обновить статус карточки: ${error.message}`);
     }
+}
+
+// Старая функция для совместимости
+async function markCard(status) {
+    const level = status === 'known' ? 3 : 0;
+    await markCardWithLevel(level);
 }
 
 
@@ -665,55 +685,7 @@ function initializeDashboard() {
          }
     });
 
-    // *** Добавить обработчик специально для отметки на обратной стороне карточки ***
-    cardBack.addEventListener('click', function(e) {
-        // Срабатывать только в режиме переворота И если карточка действительно перевернута
-        if (studyModeToggle.checked || !cardElement.classList.contains('is-flipped')) return;
-
-
-
-        const rect = cardBack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const status = (x < rect.width / 2) ? 'unknown' : 'known';
-        const flashClass = (status === 'unknown') ? 'flash-red' : 'flash-green';
-
-        // Добавить визуальную вспышку ко ВСЕЙ обратной стороне карточки
-        cardBack.classList.add(flashClass);
-        setTimeout(() => cardBack.classList.remove(flashClass), 300); // Убрать класс после анимации
-
-        // Отметить карточку и потенциально перейти к следующей
-        markCard(status);
-    });
-
-    // *** Добавить обработчик для отметки в режиме изучения ***
-    studyCardContainer.addEventListener('click', function(e) {
-        // Срабатывать только в режиме изучения
-        if (!studyModeToggle.checked) return;
-
-        const innerCard = e.target.closest('.study-card-inner');
-        if (!innerCard) return;
-
-        const rect = innerCard.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const isLeftSide = x < rect.width / 2;
-
-        // Определяем, на какой стороне был клик и какой элемент будем подсвечивать
-        if (isLeftSide) {
-            // Клик по стороне вопроса (левая) - отметить как неизвестно (красный)
-            // Подсвечиваем всю левую половину карточки
-            const questionSide = innerCard.querySelector('.study-card-question');
-            questionSide.classList.add('flash-red');
-            setTimeout(() => questionSide.classList.remove('flash-red'), 300);
-            markCard('unknown');
-        } else {
-            // Клик по стороне ответа (правая) - отметить как известно (зеленый)
-            // Подсвечиваем всю правую половину карточки
-            const answerSide = innerCard.querySelector('.study-card-answer');
-            answerSide.classList.add('flash-green');
-            setTimeout(() => answerSide.classList.remove('flash-green'), 300);
-            markCard('known');
-        }
-    });
+    // Убрали старые обработчики кликов для оценки - теперь используем кнопки
 
 
     nextBtn.addEventListener('click', nextCard);
@@ -978,6 +950,9 @@ function showBatchError(message) {
 function hideBatchError() {
     batchAddCardsError.classList.add('hidden');
 }
+
+// Сделать функции глобальными для доступа из HTML
+window.markCardWithLevel = markCardWithLevel;
 
 // Инициализировать панель управления, когда DOM готов
 document.addEventListener('DOMContentLoaded', initializeDashboard); 

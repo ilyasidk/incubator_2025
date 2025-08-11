@@ -27,6 +27,25 @@ const cardSchema = new Schema({
         type: String,
         enum: ['API', 'LLM', 'USER'],
         default: 'API'
+    },
+    knowledgeLevel: {
+        type: Number,
+        min: 0,
+        max: 3,
+        default: 0
+        // 0 = не знаю, 1 = плохо знаю, 2 = немного помню, 3 = хорошо помню
+    },
+    lastReviewed: {
+        type: Date,
+        default: null
+    },
+    reviewCount: {
+        type: Number,
+        default: 0
+    },
+    nextReviewDate: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

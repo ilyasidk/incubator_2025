@@ -56,6 +56,43 @@ router.get('/topic/:topicId', auth, checkTopicOwnerForCards, async (req, res) =>
     }
 });
 
+// Получить карточки для изучения с учетом интервального повторения
+router.get('/topic/:topicId/study', auth, checkTopicOwnerForCards, async (req, res) => {
+    try {
+        const currentDate = new Date();
+        
+        // Получаем все карточки для темы
+        const allCards = await Card.find({ 
+            topicId: req.params.topicId, 
+            userId: req.userId 
+        });
+
+        // Функция для расчета приоритета карточки
+        const calculatePriority = (card) => {
+            const level = card.knowledgeLevel || 0;
+            const nextReview = card.nextReviewDate || new Date(0);
+            const isOverdue = nextReview <= currentDate;
+            
+            // Чем меньше уровень знания, тем выше приоритет
+            // Просроченные карточки имеют дополнительный приоритет
+            let priority = (3 - level) * 10;
+            if (isOverdue) priority += 20;
+            
+            return priority;
+        };
+
+        // Сортируем карточки по приоритету
+        const sortedCards = allCards.sort((a, b) => {
+            return calculatePriority(b) - calculatePriority(a);
+        });
+
+        res.json(sortedCards);
+    } catch (error) {
+        console.error('Error fetching study cards for topic:', error);
+        res.status(500).json({ message: 'Error fetching study cards' });
+    }
+});
+
 router.get('/:id', auth, checkCardOwner, async (req, res) => {
     res.json(req.card);
 });
@@ -132,16 +169,29 @@ router.delete('/:id', auth, checkCardOwner, async (req, res) => {
     }
 });
 
-// Отметить карточку как изученную/неизученную
+// Отметить карточку с уровнем знания (0-3)
 router.post('/:id/mark', auth, checkCardOwner, async (req, res) => {
     try {
-        const { status } = req.body;
+        const { knowledgeLevel } = req.body;
         const cardId = req.params.id;
         const topicId = req.card.topicId;
 
-        if (!status || !['known', 'unknown'].includes(status)) {
-            return res.status(400).json({ message: 'Status must be "known" or "unknown"' });
+        // Проверяем уровень знания
+        if (knowledgeLevel === undefined || knowledgeLevel < 0 || knowledgeLevel > 3) {
+            return res.status(400).json({ message: 'Knowledge level must be between 0 and 3' });
         }
+
+        // Обновляем карточку с новым уровнем знания
+        const currentDate = new Date();
+        const nextReviewIntervals = [1, 3, 7, 14]; // дни для каждого уровня
+        const nextReviewDate = new Date(currentDate.getTime() + nextReviewIntervals[knowledgeLevel] * 24 * 60 * 60 * 1000);
+
+        await Card.findByIdAndUpdate(cardId, {
+            knowledgeLevel,
+            lastReviewed: currentDate,
+            $inc: { reviewCount: 1 },
+            nextReviewDate
+        });
 
         // Найти или создать прогресс для темы
         let progressDoc = await Progress.findOne({ 
@@ -159,11 +209,11 @@ router.post('/:id/mark', auth, checkCardOwner, async (req, res) => {
             });
         }
         
-        // Обновить массивы в зависимости от статуса
-        if (status === 'known') {
+        // Обновить массивы в зависимости от уровня знания
+        if (knowledgeLevel >= 2) { // немного помню или хорошо помню
             progressDoc.knownCardIds.addToSet(cardId);
             progressDoc.unknownCardIds.pull(cardId);
-        } else {
+        } else { // не знаю или плохо знаю
             progressDoc.unknownCardIds.addToSet(cardId);
             progressDoc.knownCardIds.pull(cardId);
         }
