@@ -1,94 +1,91 @@
-# Инструкция по настройке Flashcards Master
+# Flashcards Master Setup Instructions
 
-## 🚨 ВАЖНО: Настройка переменных окружения
+## 🚨 IMPORTANT: Environment Variables Setup
 
-Для корректной работы приложения необходимо создать файл `.env` в папке `backend/` со следующими переменными:
+For the application to work correctly, you need to create a `.env` file in the `backend/` folder with the following variables:
 
-### 1. Создайте файл `backend/.env`
+### 1. Create `backend/.env` file
 
 ```bash
-# Конфигурация базы данных MongoDB
+# MongoDB database configuration
 MONGODB_URI=mongodb://localhost:27017/flashcards
-# Или используйте MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/flashcards
+# Or use MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/flashcards
 
-# Порт сервера
+# Server port
 PORT=8080
 
-# JWT секретный ключ (измените на свой собственный!)
-JWT_SECRET=ваш_супер_секретный_jwt_ключ_измените_это_в_продакшене
+# JWT secret key (change to your own!)
+JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
 
-
-
-# Окружение
+# Environment
 NODE_ENV=development
 ```
 
-### 2. Настройка MongoDB
+### 2. MongoDB Setup
 
-**Локальная установка:**
-- Скачайте и установите MongoDB Community Edition
-- Запустите MongoDB сервис
-- Используйте URI: `mongodb://localhost:27017/flashcards`
+**Local installation:**
+- Download and install MongoDB Community Edition
+- Start MongoDB service
+- Use URI: `mongodb://localhost:27017/flashcards`
 
-**Или используйте MongoDB Atlas (облачное решение):**
-1. Зарегистрируйтесь на https://cloud.mongodb.com/
-2. Создайте бесплатный кластер
-3. Получите строку подключения
-4. Замените `MONGODB_URI` на вашу строку подключения
+**Or use MongoDB Atlas (cloud solution):**
+1. Register at https://cloud.mongodb.com/
+2. Create a free cluster
+3. Get connection string
+4. Replace `MONGODB_URI` with your connection string
 
-## 🚀 Запуск проекта
+## 🚀 Project Launch
 
-### Запуск Backend (Порт 8080)
+### Backend Launch (Port 8080)
 ```bash
 cd backend
 npm install
 npm start
-# или для разработки: npm run dev
+# or for development: npm run dev
 ```
 
-### Запуск Frontend (Порт 3000)
+### Frontend Launch (Port 3000)
 ```bash
 cd frontend  
 npm install
 npm start
 ```
 
-## 🔧 Решение проблем
+## 🔧 Troubleshooting
 
-### Ошибка 500 в `/api/generate`
+### Error 500 in `/api/generate`
 
+### Error 405 Method Not Allowed
+- ✅ **RESOLVED**: Backend running on port 8080
+- ✅ **RESOLVED**: Frontend configured for requests to `http://localhost:8080/api`
 
-### Ошибка 405 Method Not Allowed
-- ✅ **РЕШЕНО**: Backend запущен на порту 8080
-- ✅ **РЕШЕНО**: Frontend настроен для запросов на `http://localhost:8080/api`
+### CORS errors
+- Backend configured to accept requests from frontend
+- Ensure both servers are running
 
-### CORS ошибки
-- Backend настроен для приема запросов от frontend
-- Убедитесь, что оба сервера запущены
-
-## 📝 Структура портов
+## 📝 Port Structure
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080/api
-- **MongoDB**: localhost:27017 (по умолчанию)
+- **MongoDB**: localhost:27017 (default)
 
-## 🔐 Безопасность
+## 🔐 Security
 
-⚠️ **НИКОГДА НЕ КОММИТЬТЕ файл `.env` в git!**
+⚠️ **NEVER COMMIT `.env` file to git!**
 
-Файл `.env` уже добавлен в `.gitignore`, но убедитесь, что ваши секретные ключи остаются приватными.
+The `.env` file is already added to `.gitignore`, but make sure your secret keys remain private.
 
-## 🎯 Первые шаги после настройки
+## 🎯 First Steps After Setup
 
-1. Запустите backend: `cd backend && npm start`
-2. Запустите frontend: `cd frontend && npm start` 
-3. Откройте http://localhost:3000 в браузере
-4. Зарегистрируйтесь или войдите в систему
-5. Создайте тему и попробуйте добавить карточки!
+1. Start backend: `cd backend && npm start`
+2. Start frontend: `cd frontend && npm start` 
+3. Open http://localhost:3000 in browser
+4. Register or log in
+5. Create a topic and try adding cards!
 
-## 🆘 Если что-то не работает
+## 🆘 If Something Doesn't Work
 
-1. Проверьте консоль браузера на ошибки JavaScript
-2. Проверьте терминал backend на ошибки сервера
-3. Убедитесь, что все переменные в `.env` заполнены корректно
-4. Перезапустите оба сервера 
+1. Check browser console for JavaScript errors
+2. Check backend terminal for server errors
+3. Ensure all variables in `.env` are filled correctly
+4. Restart both servers

@@ -1,117 +1,110 @@
-
-ССЫЛКА НА САЙТ https://incubator-2025.onrender.com
-
+WEBSITE LINK https://incubator-2025.onrender.com
 
 # Flashcards Master
 
-Веб-приложение для создания и изучения флеш-карточек.
+**Pet Project**: AI-powered flashcard learning platform
 
-## Описание
+Web application for creating and studying flashcards with artificial intelligence integration.
 
-Flashcards Master - это образовательная платформа, которая помогает пользователям учить новые концепции с помощью интерактивных флеш-карточек. Приложение позволяет создавать собственные наборы карточек по различным темам, изучать их и отслеживать свой прогресс. Уникальной особенностью является возможность генерации карточек с помощью искусственного интеллекта.
+## Description
 
-Основные возможности:
-*   Управление пользователями (регистрация, вход)
-*   Создание и управление темами карточек
-*   Создание, просмотр, редактирование и удаление карточек
-*   Отслеживание прогресса обучения 
+Flashcards Master is an educational platform that helps users learn new concepts through interactive flashcards. The application allows users to create their own sets of cards on various topics, study them, and track their progress. A unique feature is the ability to generate cards using artificial intelligence.
 
+Main features:
+* User management (registration, login)
+* Creating and managing card topics
+* Creating, viewing, editing and deleting cards
+* Tracking learning progress
 
-## Технологический стек
+## Technology Stack
 
-*   **Бэкенд:** Node.js, Express.js
-*   **База данных:** MongoDB (с Mongoose)
-*   **Аутентификация:** JSON Web Tokens (JWT) с использованием `bcryptjs` для хеширования паролей
-*   **Фронтенд:** HTML, CSS, Ванильный JavaScript
-*   **Стилизация:** Tailwind CSS
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB (with Mongoose)
+* **Authentication:** JSON Web Tokens (JWT) using `bcryptjs` for password hashing
+* **Frontend:** HTML, CSS, Vanilla JavaScript
+* **Styling:** Tailwind CSS
+* **Deployment:** Docker, GitHub Actions (CI)
 
-*   **Развертывание:** Docker, GitHub Actions (CI)
+### Why this stack?
 
-### Почему такой стек?
+* **Node.js/Express:** Chosen for high performance in I/O operations (important for web server), extensive package ecosystem (npm), ability to use JavaScript on both backend and frontend, and rapid development of RESTful APIs.
+* **MongoDB:** NoSQL database flexibility is well-suited for storing documents like users, topics, and cards, whose structure may change. Mongoose simplifies database interaction and schema validation.
+* **Vanilla JS/HTML/CSS:** For the current scope of frontend functionality, complex state management or component systems provided by frameworks (React, Vue, Angular) were not required. This allowed maintaining frontend lightness and avoiding additional build steps (except for Tailwind).
+* **Tailwind CSS:** Utility-first approach significantly speeds up user interface development, ensures style consistency, and facilitates responsive design creation.
+* **Docker:** Ensures runtime environment consistency between development and production, simplifies deployment and application isolation.
+* **JWT:** Standard and secure way to implement API authentication.
 
-*   **Node.js/Express:** Выбраны за высокую производительность при обработке I/O операций (что важно для веб-сервера), обширную экосистему пакетов (npm), возможность использовать JavaScript на бэкенде и фронтенде, и быструю разработку RESTful API.
-*   **MongoDB:** Гибкость NoSQL базы данных хорошо подходит для хранения документов, таких как пользователи, темы и карточки, структура которых может меняться. Mongoose упрощает взаимодействие с БД и валидацию схем.
-*   **Ванильный JS/HTML/CSS:** Для текущего объема функциональности фронтенда не требовалась сложная логика управления состоянием или система компонентов, предоставляемая фреймворками (React, Vue, Angular). Это позволило сохранить легковесность фронтенда и избежать дополнительных шагов сборки (кроме Tailwind).
-*   **Tailwind CSS:** Утилитарный подход значительно ускоряет разработку пользовательского интерфейса, обеспечивает консистентность стилей и облегчает создание адаптивного дизайна.
+## Installation and Setup
 
-*   **Docker:** Обеспечивает консистентность среды выполнения между разработкой и продакшеном, упрощает развертывание и изоляцию приложения.
-*   **JWT:** Стандартный и безопасный способ реализации аутентификации для API.
+### Requirements
 
-## Установка и запуск
+* Node.js (version 18.x, as specified in `Dockerfile` and `ci.yml`)
+* npm
+* MongoDB (locally or remotely, requires connection string)
+* Docker (for running backend in container)
 
-### Требования
+### Backend
 
-*   Node.js (версия 18.x, как указано в `Dockerfile` и `ci.yml`)
-*   npm
-*   MongoDB (локально или удаленно, требуется строка подключения)
-*   Docker ( для запуска бэкенда в контейнере)
-
-### Бэкенд
-
-1.  Перейдите в директорию `backend`: `cd backend`
-2.  Создайте файл `.env` в корне директории `backend` и добавьте необходимые переменные окружения:
+1. Navigate to `backend` directory: `cd backend`
+2. Create `.env` file in the root of `backend` directory and add necessary environment variables:
     ```dotenv
-    MONGODB_URI=mongodb://your_mongo_uri # Строка подключения к вашей MongoDB
-    PORT= # Порт, на котором будет работать бэкенд
-    JWT_SECRET=your_jwt_secret_key # Секретный ключ для подписи JWT токенов
+   MONGODB_URI=mongodb://your_mongo_uri # Connection string to your MongoDB
+   PORT= # Port on which backend will run
+   JWT_SECRET=your_jwt_secret_key # Secret key for signing JWT tokens
+   NODE_ENV=development # Set to 'production' for production build
+   ```
+3. Install dependencies: `npm install` (or `npm ci` to use `package-lock.json`)
+4. Run development server (with auto-reload via `nodemon`): `npm run dev`
+   Or run production server: `npm start`
+5. (Optional) Populate database with test data (user `test@example.com`/`password123` and example topics/cards): `npm run seed`. **Warning:** This script deletes existing data!
 
-    NODE_ENV=development # Установите 'production' для продакшн сборки
-    ```
-3.  Установите зависимости: `npm install` (или `npm ci` для использования `package-lock.json`)
-4.  Запустите сервер для разработки (с автоперезагрузкой через `nodemon`): `npm run dev`
-    Или запустите сервер для продакшена: `npm start`
-5.  (Опционально) Заполните базу данных тестовыми данными (пользователь `test@example.com`/`password123` и примеры тем/карточек): `npm run seed`. **Внимание:** Этот скрипт удаляет существующие данные!
+### Frontend
 
-### Фронтенд
+1. Navigate to `frontend` directory: `cd frontend`
+2. Install development dependencies: `npm install`
+3. Run development server (`live-server`) and automatic Tailwind CSS compilation: `npm start`
+   This will open the application in browser (usually `http://localhost:3000`) and track changes in `src/input.css` and HTML/JS files.
 
-1.  Перейдите в директорию `frontend`: `cd frontend`
-2.  Установите зависимости разработки: `npm install`
-3.  Запустите сервер разработки (`live-server`) и автоматическую компиляцию Tailwind CSS: `npm start`
-    Это откроет приложение в браузере (обычно `http://localhost:3000`) и будет отслеживать изменения в файлах `src/input.css` и HTML/JS.
+### Docker (Backend)
 
-### Docker (Бэкенд)
+1. Ensure Docker is running.
+2. Navigate to `backend` directory: `cd backend`
+3. Ensure you have `.env` file with necessary variables in this directory.
+4. Build Docker image: `docker build -t flashcards-backend .`
+5. Run container: `docker run -p 8080:8080 --env-file .env --name flashcards-app flashcards-backend`
 
-1.  Убедитесь, что Docker запущен.
-2.  Перейдите в директорию `backend`: `cd backend`
-3.  Убедитесь, что у вас есть файл `.env` с необходимыми переменными в этой директории.
-4.  Соберите Docker образ: `docker build -t flashcards-backend .`
-5.  Запустите контейнер: `docker run -p 8080:8080 --env-file .env --name flashcards-app flashcards-backend`
+## Design and Development Process
 
-## Процесс проектирования и разработки
+Development was carried out iteratively, focusing on rapid implementation of core functionality.
 
-Разработка велась итеративно, с фокусом на быстрой реализации основного функционала.
+* **API Design:** Designed following RESTful principles. Resources (users, topics, cards, progress, generation) are separated into individual routes (`backend/routes`). Middleware (`backend/middleware/auth.js`) is used for protecting routes with JWT.
+* **Database Structure:** Mongoose schemas (`backend/models`) are defined for main entities (`User`, `Topic`, `Card`, `Progress`), reflecting their relationships (e.g., cards and progress are linked to user and topic).
+* **Interface Design:** Tailwind CSS is used for rapid styling. Main pages are `index.html` (login/registration) and `dashboard.html` (main application interface). Interface logic is implemented using vanilla JavaScript (`frontend/script.js`, `frontend/dashboard.js`, `frontend/src/generator.js`).
+* **Implementation:** Backend is built on Express.js, MongoDB interaction through Mongoose. Frontend directly interacts with DOM and sends requests to backend API. Basic CI pipeline (`.github/workflows/ci.yml`) is configured for checking backend dependency installation.
 
-*   **Проектирование API:** Спроектировано по принципам RESTful. Ресурсы (пользователи, темы, карточки, прогресс, генерация) вынесены в отдельные роуты (`backend/routes`). Использовано middleware (`backend/middleware/auth.js`) для защиты роутов с помощью JWT.
-*   **Структура базы данных:** Определены Mongoose схемы (`backend/models`) для основных сущностей (`User`, `Topic`, `Card`, `Progress`), отражающие их взаимосвязи (например, карточки и прогресс связаны с пользователем и темой).
-*   **Дизайн интерфейса:** Использован Tailwind CSS для быстрой стилизации. Основные страницы - `index.html` (логин/регистрация) и `dashboard.html` (основной интерфейс приложения). Логика интерфейса реализована с помощью ванильного JavaScript (`frontend/script.js`, `frontend/dashboard.js`, `frontend/src/generator.js`).
-*   **Реализация:** Бэкенд построен на Express.js, взаимодействие с MongoDB через Mongoose. Фронтенд напрямую взаимодействует с DOM и отправляет запросы к API бэкенда. Настроен базовый CI пайплайн (`.github/workflows/ci.yml`) для проверки установки зависимостей бэкенда.
+## Unique Approaches or Methodologies
 
-## Уникальные подходы или методологии
+* **Frontend/Backend Separation:** Clear separation into two independent applications (`frontend` and `backend`) with API interaction. Each has its own dependencies and startup scripts.
+* **Containerization:** Using Docker for backend ensures portability and simplifies deployment.
 
+## Trade-offs
 
-*   **Разделение Frontend/Backend:** Четкое разделение на два независимых приложения (`frontend` и `backend`) со взаимодействием через API. Каждое имеет свои зависимости и скрипты запуска.
-*   **Контейнеризация:** Использование Docker для бэкенда обеспечивает переносимость и упрощает развертывание.
+* **Frontend without framework:** Choosing vanilla JavaScript simplified initial development but may complicate maintenance and interface scaling with significant application complexity growth compared to using frameworks (React, Vue, Angular). State management and rendering are done manually.
+* **No tests:** The project lacks automated tests (unit, integration, e2e). This speeds up initial development but increases regression risk when making changes and complicates refactoring. CI pipeline test steps are commented out.
+* **Basic error handling:** Global error handler is implemented on backend (`backend/server.js`), but it hides error details in production. Frontend error handling and specific backend error handling can be improved for more informative feedback.
+* **Basic CORS configuration:** Standard `cors()` configuration is used. For production environment, stricter configuration with specified allowed origins may be required.
+* **Security:** Lack of explicit input validation on API endpoints (except what Mongoose may provide at schema level). Strict validation needs to be added for enhanced security.
 
-## Компромиссы
+## Known Issues or Problems / Potential Improvements
 
-*   **Фронтенд без фреймворка:** Выбор ванильного JavaScript упростил начальную разработку, но может усложнить поддержку и масштабирование интерфейса при значительном росте сложности приложения по сравнению с использованием фреймворков (React, Vue, Angular). Управление состоянием и рендеринг выполняются вручную.
-*   **Отсутствие тестов:** В проекте отсутствуют автоматизированные тесты (unit, integration, e2e). Это ускоряет начальную разработку, но повышает риск регрессий при внесении изменений и усложняет рефакторинг. В CI пайплайне шаги для тестов закомментированы.
-*   **Базовая обработка ошибок:** Реализован глобальный обработчик ошибок на бэкенде (`backend/server.js`), но он скрывает детали ошибок в продакшене. Обработка ошибок на фронтенде и специфическая обработка на бэкенде могут быть улучшены для более информативной обратной связи.
-*   **Базовая конфигурация CORS:** Использована стандартная конфигурация `cors()`. Для продакшен-среды может потребоваться более строгая настройка с указанием разрешенных источников.
-*   **Безопасность:** Отсутствие явной валидации входящих данных на API эндпоинтах (кроме той, что может предоставлять Mongoose на уровне схемы). Необходимо добавить строгую валидацию для повышения безопасности.
+* **Improve error handling:** Make error handling more detailed both on backend (logging, possibly custom error classes) and frontend (displaying clear messages to users).
+* **Input validation:** Add explicit validation for data coming to API (e.g., using `express-validator`).
+* **Enhanced security:** Configure CORS more strictly, conduct security audit (e.g., dependency vulnerability check).
+* **Linting:** Add and configure linter (e.g., ESLint) and formatter (Prettier) and include their checks in CI pipeline.
+* **Frontend scalability:** With interface complexity growth, consider transitioning to lightweight framework or state management library.
+* **Dockerfile optimization:** Dockerfile can be optimized to reduce image size and speed up build (e.g., multi-stage build).
 
-## Известные ошибки или проблемы / Потенциальные улучшения
-
-*   **Улучшение обработки ошибок:** Сделать обработку ошибок более детальной как на бэкенде (логирование, возможно, кастомные классы ошибок), так и на фронтенде (отображение понятных сообщений пользователю).
-*   **Валидация ввода:** Добавить явную валидацию данных, приходящих на API (например, с помощью `express-validator`).
-*   **Усиление безопасности:** Настроить CORS более строго, провести аудит безопасности (например, проверка зависимостей на уязвимости).
-*   **Линтинг:** Добавить и настроить линтер (например, ESLint) и форматер (Prettier) и включить их проверку в CI пайплайн.
-*   **Масштабируемость фронтенда:** При усложнении интерфейса рассмотреть переход на легковесный фреймворк или библиотеку для управления состоянием.
-*   **Оптимизация Dockerfile:** Можно оптимизировать Dockerfile для уменьшения размера образа и ускорения сборки (например, многоэтапная сборка).
-
-
-ВАЖНО!!!
-В видео я говорил, что задеплоил проект на google cloud, но у меня закончились деньги на аккаунте, поэтому я перешел на render.com
+IMPORTANT!!!
+In the video I mentioned deploying the project on Google Cloud, but I ran out of money on the account, so I switched to render.com
 
 https://youtu.be/7c1xzdytXss
-
