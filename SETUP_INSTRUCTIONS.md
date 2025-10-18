@@ -1,5 +1,8 @@
 # Flashcards Master Setup Instructions
 
+## 🔐 SECURITY WARNING
+**NEVER use real credentials in examples!** Always replace placeholder values with your actual credentials and never commit them to version control.
+
 ## 🚨 IMPORTANT: Environment Variables Setup
 
 For the application to work correctly, you need to create a `.env` file in the `backend/` folder with the following variables:
@@ -9,7 +12,7 @@ For the application to work correctly, you need to create a `.env` file in the `
 ```bash
 # MongoDB database configuration
 MONGODB_URI=mongodb://localhost:27017/flashcards
-# Or use MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/flashcards
+# Or use MongoDB Atlas: mongodb+srv://your_username:your_password@your_cluster.mongodb.net/flashcards
 
 # Server port
 PORT=8080
